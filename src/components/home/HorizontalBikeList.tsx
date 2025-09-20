@@ -1,7 +1,7 @@
-import React from "react";
-import {ScrollView} from "react-native";
-import {BikeCard} from "./BikeCard";
 import {BikeModel} from "@/types/home";
+import React from "react";
+import {FlatList} from "react-native";
+import {BikeCard} from "./BikeCard";
 
 interface HorizontalBikeListProps {
   bikes: BikeModel[];
@@ -16,18 +16,20 @@ export const HorizontalBikeList: React.FC<HorizontalBikeListProps> = ({
   cardWidth,
   showShadow,
 }) => (
-  <ScrollView
+  <FlatList
+    data={bikes}
     horizontal
+    keyExtractor={item => item.id}
     showsHorizontalScrollIndicator={false}
-    contentContainerStyle={{paddingHorizontal: 16}}>
-    {bikes.map(bike => (
+    contentContainerStyle={{paddingHorizontal: 16, paddingBottom: 12}}
+    ItemSeparatorComponent={() => <></>}
+    renderItem={({item}) => (
       <BikeCard
-        key={bike.id}
-        bike={bike}
-        onPress={onBikePress ? () => onBikePress(bike) : undefined}
+        bike={item}
+        onPress={() => onBikePress?.(item)}
         width={cardWidth}
         showShadow={showShadow}
       />
-    ))}
-  </ScrollView>
+    )}
+  />
 );

@@ -17,15 +17,15 @@ export const BikeCard: React.FC<BikeCardProps> = ({
 }) => (
   <TouchableOpacity
     onPress={onPress}
-    className={`${width} mr-4 ${showShadow ? "bg-white rounded-xl shadow-md" : "rounded-xl"}`}
+    className={`${width} mr-4 bg-white rounded-2xl shadow-md`}
     accessibilityLabel={`View details for ${bike.name}`}
     accessibilityRole="button">
     <Image
       source={{uri: bike.imageUrl}}
-      className="w-full h-28 rounded-xl"
-      resizeMode="contain"
+      className="w-full h-32 rounded-t-2xl"
+      resizeMode="cover"
     />
-    <Text className="text-center font-semibold mt-2 mb-3 px-2">
+    <Text className="text-center font-semibold mt-3 mb-4 text-gray-800 px-2">
       {bike.name}
     </Text>
   </TouchableOpacity>

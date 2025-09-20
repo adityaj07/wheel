@@ -70,7 +70,7 @@ const HomeScreen = () => {
   }, []);
 
   return (
-    <SafeAreaView className="flex-1 bg-white">
+    <SafeAreaView className="flex-1 bg-gray-50">
       <Header
         location="Mira-Bhayandar"
         onLocationPress={handleLocationPress}
@@ -92,7 +92,7 @@ const HomeScreen = () => {
           bikes={BIKE_CATEGORIES}
           onBikePress={handleCategoryPress}
           cardWidth="w-48 mt-8"
-          showShadow={false}
+          showShadow={true}
         />
 
         <PromoBanner
@@ -109,7 +109,7 @@ const HomeScreen = () => {
         <HorizontalBikeList
           bikes={TOP_PICKS}
           onBikePress={handleBikePress}
-          cardWidth="w-40"
+          cardWidth="w-44"
           showShadow={true}
         />
       </ScrollView>

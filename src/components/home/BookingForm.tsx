@@ -23,10 +23,12 @@ export const BookingForm: React.FC<BookingFormProps> = ({
   onSearch,
   isSearchDisabled = false,
 }) => (
-  <View className="px-4 mt-4">
-    <Text className="text-2xl font-bold mb-3">Book now, Ride Anywhere</Text>
+  <View className="px-4 mt-6">
+    <Text className="text-2xl font-extrabold mb-4 text-gray-900">
+      Book now, Ride Anywhere
+    </Text>
 
-    <View className="bg-white rounded-xl shadow-sm border border-yellow-400 p-3">
+    <View className="bg-white rounded-2xl shadow-lg border border-yellow-300 p-4">
       <DateTimePicker
         label="Pick up"
         dateValue={bookingData.pickupDate}
@@ -50,12 +52,12 @@ export const BookingForm: React.FC<BookingFormProps> = ({
       <TouchableOpacity
         onPress={onSearch}
         disabled={isSearchDisabled}
-        className={`py-3 rounded-lg ${
+        className={`mt-4 py-4 rounded-full ${
           isSearchDisabled ? "bg-yellow-200" : "bg-yellow-400"
         }`}
         accessibilityLabel="Search for available bikes"
         accessibilityRole="button">
-        <Text className="text-center text-black font-bold text-base">
+        <Text className="text-center text-black font-bold text-lg tracking-wide">
           SEARCH
         </Text>
       </TouchableOpacity>

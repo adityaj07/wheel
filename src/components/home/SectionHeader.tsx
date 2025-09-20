@@ -12,11 +12,11 @@ export const SectionHeader: React.FC<SectionHeaderProps> = ({
   actionText,
   onActionPress,
 }) => (
-  <View className="flex-row items-center justify-between px-4 mt-8 mb-6">
-    <Text className="text-lg font-bold">{title}</Text>
+  <View className="flex-row items-center justify-between px-4 mt-10 mb-4">
+    <Text className="text-xl font-bold text-gray-900">{title}</Text>
     {actionText && onActionPress && (
       <TouchableOpacity onPress={onActionPress}>
-        <Text className="text-sm font-semibold text-blue-600">
+        <Text className="text-sm font-semibold text-yellow-600">
           {actionText}
         </Text>
       </TouchableOpacity>
