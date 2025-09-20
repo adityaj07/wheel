@@ -1,24 +1,45 @@
-import { authController } from "@/controller";
-import { validate } from "@/middleware/validate";
-import { LoginSchema, SignUpSchema } from "@/schemas/auth";
-import { Router } from "express";
+import {authController} from "@/controller";
+import {validate} from "@/middleware/validate";
+import {
+  LoginSchema,
+  LogoutSchema,
+  RefreshSchema,
+  SignUpSchema,
+} from "@/schemas/auth";
+import {Router} from "express";
 
-const authRouter = Router({ mergeParams: true });
+const authRouter = Router({mergeParams: true});
 
 authRouter.post(
-  "/sign-up",
+  "/signup",
   validate({
     body: SignUpSchema,
   }),
-  authController.signup
+  authController.signup,
 );
 
 authRouter.post(
-  "/log-in",
+  "/login",
   validate({
     body: LoginSchema,
   }),
-  authController.login
+  authController.login,
+);
+
+authRouter.post(
+  "/refresh-token",
+  validate({
+    body: RefreshSchema,
+  }),
+  authController.refreshToken,
+);
+
+authRouter.post(
+  "/logout",
+  validate({
+    body: LogoutSchema,
+  }),
+  authController.logout,
 );
 
 export default authRouter;

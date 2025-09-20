@@ -1,18 +1,20 @@
-import { db } from "@/lib/db";
-import type { CreateRefreshTokenParams } from "@/types/auth";
+import {db} from "@/lib/db";
+import type {CreateRefreshTokenParams} from "@/types/auth";
 import bcrypt from "bcryptjs";
-import { uuid } from "uuidv4";
+import crypto from "crypto";
 
 const SALT_ROUNDS = 12;
 
 export function generateRefreshTokenString() {
-  return uuid() + "." + uuid();
+  return crypto.randomBytes(64).toString("hex");
 }
 
-export async function hashToken(token: string) {
-  const salt = await bcrypt.genSalt(SALT_ROUNDS);
+export function getFingerprint(token: string): string {
+  return crypto.createHash("sha256").update(token).digest("hex");
+}
 
-  return bcrypt.hash(token, salt);
+export async function hashRefreshToken(token: string): Promise<string> {
+  return bcrypt.hash(token, SALT_ROUNDS);
 }
 
 export async function verifyTokenHash(token: string, hash: string) {
@@ -27,10 +29,13 @@ export async function createRefreshToken({
   createdByIp,
   userAgent,
 }: CreateRefreshTokenParams) {
-  const tokenHash = await hashToken(token);
+  const tokenHash = await hashRefreshToken(token);
+  const tokenFingerprint = getFingerprint(token);
+
   const refreshToken = await db.refreshToken.create({
     data: {
       tokenHash,
+      tokenFingerprint,
       expiresAt,
       createdByIp,
       userId,
@@ -40,4 +45,11 @@ export async function createRefreshToken({
   });
 
   return refreshToken;
+}
+
+export async function verifyRefreshToken(
+  token: string,
+  tokenHash: string,
+): Promise<Boolean> {
+  return bcrypt.compare(token, tokenHash);
 }

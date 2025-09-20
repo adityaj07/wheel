@@ -8,30 +8,236 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+enum BookingStatus {
+  PENDING
+  CONFIRMED
+  ACTIVE
+  COMPLETED
+  CANCELLED
+  REFUNDED
+}
+
+enum PaymentStatus {
+  PENDING
+  COMPLETED
+  FAILED
+  REFUNDED
+  PARTIALLY_REFUNDED
+}
+
+enum PaymentType {
+  BOOKING
+  SECURITY_DEPOSIT
+  EXTRA_CHARGES
+  REFUND
+}
+
 model User {
-  id            String         @id @default(uuid())
-  name          String
-  email         String?        @unique
-  phone         String         @unique
-  passwordHash  String
-  refreshTokens RefreshToken[]
+  id           String  @id @default(uuid())
+  name         String
+  phone        String? @unique
+  email        String  @unique
+  passwordHash String
+
+  dateOfBirth   DateTime?
+  licenseNumber String?
+  address       String?
+  city          String?
+  state         String?
+  zipCode       String?
+
+  isVerified Boolean @default(false)
+  isActive   Boolean @default(true)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+
+  refreshTokens RefreshToken[]
+  bookings      Booking[]
+  reviews       Review[]
+  payments      Payment[]
 }
 
 model RefreshToken {
-  id              String    @id @default(uuid())
-  tokenHash       String
-  expiresAt       DateTime
-  createdAt       DateTime  @default(now())
-  createdByIp     String?
-  revokedAt       DateTime?
-  revokedByIp     String?
-  revokedReason   String?
-  replacedByToken String? // id of the new token
-  user            User      @relation(fields: [userId], references: [id], onDelete: Cascade)
-  userId          String
-  userAgent       String?
-  isActive        Boolean   @default(true)
+  id               String    @id @default(uuid())
+  tokenHash        String
+  tokenFingerprint String
+  expiresAt        DateTime
+  createdAt        DateTime  @default(now())
+  createdByIp      String?
+  revokedAt        DateTime?
+  revokedByIp      String?
+  revokedReason    String?
+  replacedByToken  String? // id of the new token
+  userAgent        String?
+  isActive         Boolean   @default(true)
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model VehicleCategory {
+  id          String  @id @default(uuid())
+  name        String  @unique
+  description String?
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  Vehicle   Vehicle[]
+}
+
+model Location {
+  id        String  @id @default(uuid())
+  name      String  @unique
+  address   String
+  city      String
+  state     String
+  zipCode   String
+  latitude  Float?
+  longitude Float?
+  isActive  Boolean @default(true)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  vehicleLocations VehicleLocation[]
+  bookings         Booking[]
+}
+
+model Vehicle {
+  id     String  @id @default(uuid())
+  name   String
+  number String  @unique
+  model  String?
+  brand  String?
+  year   Int?
+  color  String?
+
+  images       Json?
+  primaryImage String?
+
+  pricePerDay Float
+  includedKm  Int   @default(0)
+  extraKmRate Float @default(0)
+
+  fuelType       String? // Petrol, Diesel, Electric
+  engineCapacity String?
+  mileage        String?
+
+  isAvailable Boolean @default(true)
+  isActive    Boolean @default(true)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  categoryId String
+  category   VehicleCategory @relation(fields: [categoryId], references: [id])
+
+  vehicleLocations VehicleLocation[]
+  bookings         Booking[]
+  reviews          Review[]
+}
+
+model VehicleLocation {
+  id         String @id @default(uuid())
+  vehicleId  String
+  locationId String
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  vehicle  Vehicle  @relation(fields: [vehicleId], references: [id])
+  location Location @relation(fields: [locationId], references: [id])
+
+  @@unique([vehicleId, locationId])
+}
+
+model Booking {
+  id            String @id @default(uuid())
+  bookingNumber String @unique @default(uuid())
+
+  startDate DateTime
+  endDate   DateTime
+  startTime String
+  endTime   String
+
+  totalPricing    Float
+  securityDeposit Float?
+  extraCharges    Float  @default(0) // for damages, extra km, etc
+
+  status BookingStatus @default(PENDING)
+
+  pickupLocation  String?
+  dropoffLocation String?
+  specialRequests String?
+
+  actualStartTime DateTime?
+  actualEndTime   DateTime?
+  totalKmRidden   Int?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id])
+
+  vehicleId String
+  vehicle   Vehicle @relation(fields: [vehicleId], references: [id])
+
+  locationId String
+  location   Location @relation(fields: [locationId], references: [id])
+
+  payments Payment[]
+  reviews  Review[]
+}
+
+model Payment {
+  id            String        @id @default(uuid())
+  amount        Float
+  currency      String        @default("INR")
+  paymentMethod String? // UPI, Card, etc
+  transactionId String? // external payment gateway trans ID
+  status        PaymentStatus @default(PENDING)
+  type          PaymentType   @default(BOOKING)
+
+  gatewayResponse Json?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  bookingId String
+  booking   Booking @relation(fields: [bookingId], references: [id])
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id])
+}
+
+model Review {
+  id      String  @id @default(uuid())
+  rating  Int
+  comment String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id])
+
+  bookingId String
+  booking   Booking @relation(fields: [bookingId], references: [id])
+
+  vehicleId String
+  vehicle   Vehicle @relation(fields: [vehicleId], references: [id])
+
+  @@unique([userId, bookingId]) // only 1 review per user per booking
+}
+
+model Setting {
+  id        String   @id @default(uuid())
+  key       String   @unique
+  value     Json
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("settings")
 }
