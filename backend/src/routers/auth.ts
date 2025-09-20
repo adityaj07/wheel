@@ -1,4 +1,5 @@
 import {authController} from "@/controller";
+import {requireAuth} from "@/middleware/auth";
 import {validate} from "@/middleware/validate";
 import {
   LoginSchema,
