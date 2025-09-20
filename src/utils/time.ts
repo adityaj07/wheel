@@ -1,27 +1,47 @@
 import {TimeSlot} from "@/types/home";
 import dayjs from "dayjs";
+import isSameOrBefore from "dayjs/plugin/isSameOrBefore";
 
-export const generateTimeSlots = (selectedDate: string | null): TimeSlot[] => {
+dayjs.extend(isSameOrBefore);
+
+export const generateTimeSlots = (
+  selectedDate: string | null,
+  minTime?: string, // HH:mm format
+): TimeSlot[] => {
   const times: TimeSlot[] = [];
+  if (!selectedDate) return times;
+
   const now = dayjs();
   let start: dayjs.Dayjs;
 
-  if (!selectedDate || dayjs(selectedDate).isAfter(now, "day")) {
-    start = dayjs().startOf("day").hour(0).minute(0).second(0);
+  // Start at either midnight (future date) or nearest half hour (today)
+  if (dayjs(selectedDate).isAfter(now, "day")) {
+    start = dayjs(selectedDate).startOf("day");
   } else {
+    const current = dayjs();
     start =
-      dayjs().minute() > 30
-        ? dayjs().add(1, "hour").minute(0).second(0)
-        : dayjs().minute(30).second(0);
+      current.minute() > 30
+        ? current.add(1, "hour").minute(0).second(0)
+        : current.minute(30).second(0);
   }
 
-  const end = dayjs().endOf("day").hour(23).minute(59);
+  const end = dayjs(selectedDate).endOf("day");
 
   while (start.isBefore(end)) {
+    const value = start.format("HH:mm");
+    const dropoffDateTime = dayjs(`${selectedDate}T${value}`);
+    const minDateTime = minTime
+      ? dayjs(`${selectedDate}T${minTime}`)
+      : undefined;
+
     times.push({
-      value: start.format("HH:mm"),
+      value,
       label: start.format("hh:mm A"),
+      disabled: minDateTime
+        ? dropoffDateTime.isSameOrBefore(minDateTime)
+        : false,
     });
+
     start = start.add(30, "minute");
   }
 
@@ -35,5 +55,9 @@ export const formatDate = (dateString: string | null): string => {
 
 export const formatTime = (timeString: string | null): string => {
   if (!timeString) return "Time";
-  return timeString;
+  const [hours, minutes] = timeString.split(":");
+  return dayjs()
+    .hour(parseInt(hours))
+    .minute(parseInt(minutes))
+    .format("hh:mm A");
 };

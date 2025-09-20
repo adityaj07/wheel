@@ -7,9 +7,17 @@ import {SectionHeader} from "@/components/home/SectionHeader";
 import {BIKE_CATEGORIES, TOP_PICKS} from "@/constants/home";
 import {useBooking} from "@/hooks/useBooking";
 import {BikeModel} from "@/types/home";
+import Ionicons from "@react-native-vector-icons/ionicons";
 import {useNavigation} from "@react-navigation/native";
 import React, {useCallback} from "react";
-import {Alert, ScrollView} from "react-native";
+import {
+  Alert,
+  FlatList,
+  ScrollView,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
 import {Calendar} from "react-native-calendars";
 import {SafeAreaView} from "react-native-safe-area-context";
 
@@ -21,6 +29,8 @@ const HomeScreen = () => {
     updateBookingData,
     toggleModal,
     isSearchDisabled,
+    pickupTimeSlots,
+    dropoffTimeSlots,
   } = useBooking();
 
   const handleLocationPress = useCallback(() => {
@@ -105,9 +115,19 @@ const HomeScreen = () => {
       </ScrollView>
 
       {/* Modals */}
+      {/* Pickup Date Modal */}
       <CustomModal
         visible={modals.showPickupDate}
-        onClose={() => toggleModal("showPickupDate", false)}>
+        onClose={() => toggleModal("showPickupDate", false)}
+        header={
+          <View className="flex-row justify-between items-center mb-4">
+            <Text className="text-lg font-bold">Select Pick up date</Text>
+            <TouchableOpacity
+              onPress={() => toggleModal("showPickupDate", false)}>
+              <Ionicons name="close" size={20} />
+            </TouchableOpacity>
+          </View>
+        }>
         <Calendar
           onDayPress={day => {
             updateBookingData({pickupDate: day.dateString});
@@ -123,9 +143,19 @@ const HomeScreen = () => {
         />
       </CustomModal>
 
+      {/* Drop off date Modal */}
       <CustomModal
         visible={modals.showDropoffDate}
-        onClose={() => toggleModal("showDropoffDate", false)}>
+        onClose={() => toggleModal("showDropoffDate", false)}
+        header={
+          <View className="flex-row justify-between items-center mb-4">
+            <Text className="text-lg font-bold">Select Drop off date</Text>
+            <TouchableOpacity
+              onPress={() => toggleModal("showDropoffDate", false)}>
+              <Ionicons name="close" size={20} />
+            </TouchableOpacity>
+          </View>
+        }>
         <Calendar
           onDayPress={day => {
             updateBookingData({dropoffDate: day.dateString});
@@ -140,6 +170,74 @@ const HomeScreen = () => {
           minDate={
             bookingData.pickupDate || new Date().toISOString().split("T")[0]
           }
+        />
+      </CustomModal>
+
+      {/* Pick up Time Modal */}
+      <CustomModal
+        visible={modals.showPickupTime}
+        onClose={() => toggleModal("showPickupTime", false)}
+        className="max-h-80 min-w-[80%]"
+        header={
+          <View className="flex-row justify-between items-center mb-4">
+            <Text className="text-lg font-bold">Select Pick up time</Text>
+            <TouchableOpacity
+              onPress={() => toggleModal("showPickupTime", false)}>
+              <Ionicons name="close" size={20} />
+            </TouchableOpacity>
+          </View>
+        }>
+        <FlatList
+          data={pickupTimeSlots}
+          keyExtractor={item => item.value}
+          renderItem={({item}) => (
+            <TouchableOpacity
+              className="px-4 py-3 border-b border-gray-100"
+              onPress={() => {
+                updateBookingData({pickupTime: item.value});
+                toggleModal("showPickupTime", false);
+              }}>
+              <Text
+                className={`text-base ${item.disabled ? "text-gray-400" : "text-black"}`}>
+                {item.label}
+              </Text>
+            </TouchableOpacity>
+          )}
+        />
+      </CustomModal>
+
+      {/* Drop off time modal */}
+      <CustomModal
+        visible={modals.showDropoffTime}
+        onClose={() => toggleModal("showDropoffTime", false)}
+        className="max-h-80 min-w-[80%]"
+        header={
+          <View className="flex-row justify-between items-center mb-4">
+            <Text className="text-lg font-bold">Select Drop off time</Text>
+            <TouchableOpacity
+              onPress={() => toggleModal("showDropoffTime", false)}>
+              <Ionicons name="close" size={20} />
+            </TouchableOpacity>
+          </View>
+        }>
+        <FlatList
+          data={dropoffTimeSlots}
+          keyExtractor={item => item.value}
+          renderItem={({item}) => (
+            <TouchableOpacity
+              className="px-4 py-3 border-b border-gray-100"
+              disabled={item.disabled}
+              onPress={() => {
+                if (item.disabled) return;
+                updateBookingData({dropoffTime: item.value});
+                toggleModal("showDropoffTime", false);
+              }}>
+              <Text
+                className={`text-base ${item.disabled ? "text-gray-400" : "text-black"}`}>
+                {item.label}
+              </Text>
+            </TouchableOpacity>
+          )}
         />
       </CustomModal>
     </SafeAreaView>

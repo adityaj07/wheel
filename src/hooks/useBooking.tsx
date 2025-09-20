@@ -32,7 +32,12 @@ export const useBooking = () => {
   );
 
   const pickupTimeSlots = generateTimeSlots(bookingData.pickupDate);
-  const dropoffTimeSlots = generateTimeSlots(bookingData.dropoffDate);
+  const dropoffTimeSlots = generateTimeSlots(
+    bookingData.dropoffDate,
+    bookingData.pickupDate === bookingData.dropoffDate
+      ? (bookingData.pickupTime ?? undefined)
+      : undefined,
+  );
 
   const isSearchDisabled = !bookingData.pickupDate || !bookingData.dropoffDate;
 
