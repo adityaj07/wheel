@@ -30,8 +30,7 @@ const AuthStackNavigator = () => {
       <Stack.Navigator
         screenOptions={{
           headerShown: false,
-        }}
-        initialRouteName={ROUTES.LOGIN}>
+        }}>
         <Stack.Screen
           name={ROUTES.SPLASH}
           component={SplashScreen}
