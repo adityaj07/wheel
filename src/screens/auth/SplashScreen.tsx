@@ -1,0 +1,63 @@
+import {useNavigation} from "@react-navigation/native";
+import {NativeStackNavigationProp} from "@react-navigation/native-stack";
+import React, {useEffect} from "react";
+import {Image, StatusBar, Text, View} from "react-native";
+import LinearGradient from "react-native-linear-gradient";
+
+type RootStackParamList = {
+  ChooseLoginSignup: undefined;
+};
+
+type SplashScreenNavigationProp = NativeStackNavigationProp<
+  RootStackParamList,
+  "ChooseLoginSignup"
+>;
+
+const SplashScreen = () => {
+  const navigation = useNavigation<SplashScreenNavigationProp>();
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      navigation.replace("ChooseLoginSignup"); // Navigate after 2.5s
+    }, 2500);
+    return () => clearTimeout(timer);
+  }, [navigation]);
+
+  return (
+    <View className="flex-1 bg-white relative">
+      <StatusBar barStyle="light-content" />
+
+      {/* Background Gradient */}
+      <LinearGradient
+        colors={["#facc15", "#f59e0b"]}
+        className="absolute inset-0"
+      />
+
+      {/* Centered Logo */}
+      <View className="flex-1 justify-center items-center">
+        <View className="bg-white rounded-3xl p-6 shadow-lg">
+          <Image
+            source={{uri: "https://dummyimage.com/150x150/000/fff&text=Wheel"}}
+            className="w-36 h-36"
+            resizeMode="contain"
+          />
+        </View>
+
+        <Text className="mt-6 text-2xl font-bold text-white tracking-widest">
+          WHEEL
+        </Text>
+        <Text className="mt-2 text-sm text-white opacity-80">
+          Renting Dreams Since 2025
+        </Text>
+      </View>
+
+      <View className="absolute bottom-12 left-0 right-0 flex-row justify-center">
+        <Text className="text-white/80 text-xs">
+          Powered by Otterr Studios 🦦
+        </Text>
+      </View>
+    </View>
+  );
+};
+
+export default SplashScreen;

@@ -1,15 +1,5 @@
 import {BikeModel} from "@/types/home";
 
-export const COLORS = {
-  PRIMARY: "#FFD700",
-  SECONDARY: "#3B82F6",
-  BORDER: "#E5E7EB",
-  TEXT_PRIMARY: "#1F2937",
-  TEXT_SECONDARY: "#6B7280",
-  WHITE: "#FFFFFF",
-  BLACK: "#000000",
-} as const;
-
 export const BIKE_CATEGORIES: BikeModel[] = [
   {
     id: "1",
