@@ -5,6 +5,7 @@ import {HorizontalBikeList} from "@/components/home/HorizontalBikeList";
 import {PromoBanner} from "@/components/home/PromoBanner";
 import {SectionHeader} from "@/components/home/SectionHeader";
 import {BIKE_CATEGORIES, TOP_PICKS} from "@/constants/home";
+import {useAuth} from "@/contexts/AuthContext";
 import {useBooking} from "@/hooks/useBooking";
 import {BikeModel} from "@/types/home";
 import Ionicons from "@react-native-vector-icons/ionicons";
@@ -32,6 +33,7 @@ const HomeScreen = () => {
     pickupTimeSlots,
     dropoffTimeSlots,
   } = useBooking();
+  const {logout} = useAuth();
 
   const handleLocationPress = useCallback(() => {
     // Navigate to location selection screen
@@ -69,13 +71,35 @@ const HomeScreen = () => {
     Alert.alert("Promo", "Promo details coming soon!");
   }, []);
 
+  const handleLogout = useCallback(async () => {
+    Alert.alert("Logout", "Are you sure you want to logout?", [
+      {text: "Cancel", style: "cancel"},
+      {
+        text: "Logout",
+        style: "destructive",
+        onPress: async () => {
+          await logout();
+        },
+      },
+    ]);
+  }, [logout]);
+
   return (
     <SafeAreaView className="flex-1 bg-gray-50">
-      <Header
-        location="Mira-Bhayandar"
-        onLocationPress={handleLocationPress}
-        onOffersPress={handleOffersPress}
-      />
+      <View className="flex-row items-center justify-between px-4 py-3 border-b border-gray-200 bg-white">
+        <Header
+          location="Mira-Bhayandar"
+          onLocationPress={handleLocationPress}
+          onOffersPress={handleOffersPress}
+        />
+        <TouchableOpacity
+          onPress={handleLogout}
+          className="p-2 rounded-lg bg-red-50"
+          accessibilityLabel="Logout"
+          accessibilityRole="button">
+          <Ionicons name="log-out-outline" size={20} color="#ef4444" />
+        </TouchableOpacity>
+      </View>
 
       <ScrollView className="flex-1" showsVerticalScrollIndicator={false}>
         <BookingForm

@@ -1,4 +1,5 @@
-import Icon from "@/components/Icon";
+import Icon from "@/components/common/Icon";
+import {useAuth} from "@/contexts/AuthContext";
 import {useTheme} from "@/contexts/ThemeContext";
 import {AuthStackParamList} from "@/navigation/navigators/AuthStackNavigator";
 
@@ -15,6 +16,7 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
+import {toast} from "sonner-native";
 
 type SignupScreenNavigationProp = NativeStackNavigationProp<
   AuthStackParamList,
@@ -24,6 +26,7 @@ type SignupScreenNavigationProp = NativeStackNavigationProp<
 const SignupScreen = () => {
   const navigation = useNavigation<SignupScreenNavigationProp>();
   const {theme} = useTheme();
+  const {signup, isLoading} = useAuth();
 
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
@@ -36,8 +39,32 @@ const SignupScreen = () => {
     resolver: zodResolver(SignUpSchema),
   });
 
-  const onSubmit = (data: SignUpSchemaType) => {
-    console.log("Form data: ", data);
+  const onSubmit = async ({
+    name,
+    email,
+    password,
+    confirmPassword,
+  }: SignUpSchemaType) => {
+    try {
+      await signup({
+        name,
+        email,
+        password,
+        confirmPassword,
+      });
+      // on success, AuthProvider sets user and navigation switches automatically
+      navigation.navigate("Login");
+    } catch (error: any) {
+      const message = error?.response?.data?.message ?? "Signup failed";
+      const description = error?.response?.data?.details?.[0]?.message;
+
+      toast.error(message, {
+        ...(description && {description}),
+        style: {
+          backgroundColor: "red",
+        },
+      });
+    }
   };
 
   return (
@@ -213,8 +240,11 @@ const SignupScreen = () => {
         <TouchableOpacity
           onPress={handleSubmit(onSubmit)}
           className="py-4 rounded-2xl mt-2 items-center"
-          style={{backgroundColor: theme.primary, ...theme.shadow}}>
-          <Text className="text-white text-[15px] font-semibold">Sign Up</Text>
+          style={{backgroundColor: theme.primary, ...theme.shadow}}
+          disabled={isLoading}>
+          <Text className="text-white text-[15px] font-semibold">
+            {isLoading ? "Signing you up..." : "Sign up"}
+          </Text>
         </TouchableOpacity>
 
         {/* Terms */}

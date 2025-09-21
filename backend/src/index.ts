@@ -1,5 +1,5 @@
-import { env } from "@/config/env";
-import { errorHandler, notFoundHandler } from "@/middleware/errorHandler";
+import {env} from "@/config/env";
+import {errorHandler, notFoundHandler} from "@/middleware/errorHandler";
 import indexRouter from "@/routers";
 import compression from "compression";
 import cors from "cors";
@@ -24,10 +24,10 @@ app.use(notFoundHandler);
 
 app.use(errorHandler);
 
-const PORT = env.PORT || 3000;
+const PORT = parseInt(env.PORT) || 3000;
 
-const server = app.listen(PORT, () => {
-  console.log(`🚀 Server running on http://localhost:${PORT}`);
+const server = app.listen(PORT, "0.0.0.0", () => {
+  console.log(`🚀 Server running on http://0.0.0.0:${PORT}`);
 });
 
 // Graceful shutdown

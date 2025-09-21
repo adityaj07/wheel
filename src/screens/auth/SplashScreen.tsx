@@ -1,3 +1,4 @@
+import ROUTES from "@/routes/Routes";
 import {useNavigation} from "@react-navigation/native";
 import {NativeStackNavigationProp} from "@react-navigation/native-stack";
 import React, {useEffect} from "react";
@@ -5,12 +6,12 @@ import {Image, StatusBar, Text, View} from "react-native";
 import LinearGradient from "react-native-linear-gradient";
 
 type RootStackParamList = {
-  ChooseLoginSignup: undefined;
+  [ROUTES.CHOOSE_LOGIN_SIGNUP]: undefined;
 };
 
 type SplashScreenNavigationProp = NativeStackNavigationProp<
   RootStackParamList,
-  "ChooseLoginSignup"
+  typeof ROUTES.CHOOSE_LOGIN_SIGNUP
 >;
 
 const SplashScreen = () => {
@@ -18,8 +19,8 @@ const SplashScreen = () => {
 
   useEffect(() => {
     const timer = setTimeout(() => {
-      navigation.replace("ChooseLoginSignup"); // Navigate after 2.5s
-    }, 2500);
+      navigation.replace(ROUTES.CHOOSE_LOGIN_SIGNUP);
+    }, 1500);
     return () => clearTimeout(timer);
   }, [navigation]);
 

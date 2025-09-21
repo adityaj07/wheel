@@ -1,4 +1,4 @@
-import {cn} from "@/lib/utils";
+import {cn} from "@/utils/cn";
 import React from "react";
 import {Modal, Text, TouchableOpacity, View} from "react-native";
 

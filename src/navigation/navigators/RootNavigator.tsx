@@ -8,19 +8,20 @@ import {
   setIsnavigationReady,
 } from "../Navigation";
 
+import {useAuth} from "@/contexts/AuthContext";
 import ROUTES from "@/routes/Routes";
+import {Text} from "react-native";
 import AuthStackNavigator from "./AuthStackNavigator";
 import BottomTabNavigator from "./BottomTabNavigator";
 
 const AppContent = () => {
   const Stack = createNativeStackNavigator();
-
-  const isAuthtenticated = false;
+  const {isAuthenticated, isLoading} = useAuth();
 
   const handleStateChange = (state: NavigationState | undefined) => {
     Logger.info("Navigation State Changed: ", {
       state,
-      isAuthtenticated,
+      isAuthenticated,
     });
     parseAndLogRoute(state);
   };
@@ -40,7 +41,7 @@ const AppContent = () => {
         screenOptions={{
           headerShown: false,
         }}>
-        {isAuthtenticated ? (
+        {isAuthenticated ? (
           <Stack.Screen
             name={ROUTES.MAIN_TABS}
             component={BottomTabNavigator}

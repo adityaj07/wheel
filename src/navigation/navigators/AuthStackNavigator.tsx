@@ -30,14 +30,20 @@ const AuthStackNavigator = () => {
       <Stack.Navigator
         screenOptions={{
           headerShown: false,
-          animation: "slide_from_right",
-        }}>
+        }}
+        initialRouteName={ROUTES.LOGIN}>
+        <Stack.Screen
+          name={ROUTES.SPLASH}
+          component={SplashScreen}
+          options={{
+            animation: "default",
+          }}
+        />
+
         <Stack.Screen
           name={ROUTES.CHOOSE_LOGIN_SIGNUP}
           component={ChooseLoginSignupScreen}
         />
-
-        <Stack.Screen name={ROUTES.SPLASH} component={SplashScreen} />
 
         <Stack.Screen
           name={ROUTES.PHONE_NUMBER}
@@ -45,8 +51,20 @@ const AuthStackNavigator = () => {
         />
         <Stack.Screen name={ROUTES.OTP} component={otpScreen} />
 
-        <Stack.Screen name={ROUTES.LOGIN} component={LoginScreen} />
-        <Stack.Screen name={ROUTES.SIGNUP} component={SignupScreen} />
+        <Stack.Screen
+          name={ROUTES.LOGIN}
+          component={LoginScreen}
+          options={{
+            animation: "slide_from_right",
+          }}
+        />
+        <Stack.Screen
+          name={ROUTES.SIGNUP}
+          component={SignupScreen}
+          options={{
+            animation: "slide_from_right",
+          }}
+        />
       </Stack.Navigator>
     </Suspense>
   );

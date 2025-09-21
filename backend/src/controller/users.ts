@@ -8,7 +8,9 @@ export const me = asyncHandler<NoParams, NoParams, NoParams>(
   async (req, res) => {
     const currentUserId = req.user?.sub;
 
-    console.log("currentUserId: ", currentUserId);
+    if (!currentUserId) {
+      throw new AppError("Unauthorized", StatusCodes.UNAUTHORIZED.code);
+    }
 
     const user = await db.user.findUnique({
       where: {id: currentUserId},
@@ -30,44 +32,35 @@ export const me = asyncHandler<NoParams, NoParams, NoParams>(
         bookings: {
           select: {
             id: true,
-            bookingNumber: true,
             startDate: true,
             endDate: true,
+            startTime: true,
+            endTime: true,
+            location: true,
+            totalPrice: true,
             status: true,
-            totalPricing: true,
             vehicle: {
               select: {
                 id: true,
                 name: true,
                 number: true,
-                brand: true,
-                primaryImage: true,
+                pricePerDay: true,
+                totalPriceFor2Days: true,
+                includedKmPerDay: true,
+                includedKmFor2Days: true,
+                locations: {
+                  select: {location: true},
+                },
+                vehicleType: {
+                  select: {id: true, name: true},
+                },
               },
-            },
-            payments: {
-              select: {
-                id: true,
-                amount: true,
-                status: true,
-                type: true,
-                createdAt: true,
-              },
-              take: 5,
-              orderBy: {createdAt: "desc"},
             },
           },
           orderBy: {createdAt: "desc"},
           take: 10,
         },
-        reviews: {
-          select: {
-            id: true,
-            rating: true,
-            comment: true,
-            vehicle: {select: {id: true, name: true, number: true}},
-          },
-          orderBy: {createdAt: "desc"},
-        },
+        refreshTokens: false,
       },
     });
 

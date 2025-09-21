@@ -1,5 +1,5 @@
 import {IMAGES} from "@/assets/images";
-import Icon from "@/components/Icon";
+import Icon from "@/components/common/Icon";
 import {useTheme} from "@/contexts/ThemeContext";
 import {useNavigation} from "@react-navigation/native";
 import {NativeStackNavigationProp} from "@react-navigation/native-stack";

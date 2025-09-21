@@ -29,7 +29,10 @@ export const signup = asyncHandler<NoParams, NoParams, SignupBody>(
       },
     });
     if (userExists) {
-      throw new AppError("User already exists", StatusCodes.BAD_REQUEST.code);
+      throw new AppError(
+        "Account already exists. Please Login",
+        StatusCodes.BAD_REQUEST.code,
+      );
     }
 
     const passwordHash = await bcrypt.hash(password, 12);

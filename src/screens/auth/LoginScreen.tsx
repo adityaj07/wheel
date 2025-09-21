@@ -1,4 +1,5 @@
-import Icon from "@/components/Icon";
+import Icon from "@/components/common/Icon";
+import {useAuth} from "@/contexts/AuthContext";
 import {useTheme} from "@/contexts/ThemeContext";
 import {AuthStackParamList} from "@/navigation/navigators/AuthStackNavigator";
 import {LoginSchema, LoginSchemaType} from "@/schemas/auth/index";
@@ -14,6 +15,7 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
+import {toast} from "sonner-native";
 
 type LoginScreenNavigationProp = NativeStackNavigationProp<
   AuthStackParamList,
@@ -23,6 +25,7 @@ type LoginScreenNavigationProp = NativeStackNavigationProp<
 const LoginScreen = () => {
   const navigation = useNavigation<LoginScreenNavigationProp>();
   const {theme} = useTheme();
+  const {login, isLoading} = useAuth();
 
   const [showPassword, setShowPassword] = useState(false);
 
@@ -34,8 +37,21 @@ const LoginScreen = () => {
     resolver: zodResolver(LoginSchema),
   });
 
-  const onSubmit = (data: LoginSchemaType) => {
-    console.log("Form data: ", data);
+  const onSubmit = async ({email, password}: LoginSchemaType) => {
+    try {
+      await login({email, password});
+      // on success, AuthProvider sets user and navigation switches automatically
+    } catch (error: any) {
+      const message = error?.response?.data?.message ?? "Login failed";
+      const description = error?.response?.data?.details?.[0]?.message;
+
+      toast.error(message, {
+        ...(description && {description}),
+        style: {
+          backgroundColor: "red",
+        },
+      });
+    }
   };
 
   return (
@@ -136,8 +152,11 @@ const LoginScreen = () => {
         <TouchableOpacity
           className="py-4 rounded-2xl mt-2 items-center shadow-md"
           style={{backgroundColor: theme.primary}}
-          onPress={handleSubmit(onSubmit)}>
-          <Text className="text-white text-[16px] font-semibold">Log in</Text>
+          onPress={handleSubmit(onSubmit)}
+          disabled={isLoading}>
+          <Text className="text-white text-[16px] font-semibold">
+            {isLoading ? "Logging you in..." : "Login"}
+          </Text>
         </TouchableOpacity>
 
         {/* Terms */}
