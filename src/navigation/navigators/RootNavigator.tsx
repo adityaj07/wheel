@@ -1,24 +1,24 @@
-import Logger from '@/utils/Logger';
-import {NavigationContainer, NavigationState} from '@react-navigation/native';
-import {createNativeStackNavigator} from '@react-navigation/native-stack';
-import React, {useEffect} from 'react';
+import Logger from "@/utils/Logger";
+import {NavigationContainer, NavigationState} from "@react-navigation/native";
+import {createNativeStackNavigator} from "@react-navigation/native-stack";
+import React, {useEffect} from "react";
 import {
   navigationRef,
   parseAndLogRoute,
   setIsnavigationReady,
-} from '../Navigation';
+} from "../Navigation";
 
-import ROUTES from '@/routes/Routes';
-import AuthStackNavigator from './AuthStackNavigator';
-import BottomTabNavigator from './BottomTabNavigator';
+import ROUTES from "@/routes/Routes";
+import AuthStackNavigator from "./AuthStackNavigator";
+import BottomTabNavigator from "./BottomTabNavigator";
 
 const AppContent = () => {
   const Stack = createNativeStackNavigator();
 
-  const isAuthtenticated = true;
+  const isAuthtenticated = false;
 
   const handleStateChange = (state: NavigationState | undefined) => {
-    Logger.info('Navigation State Changed: ', {
+    Logger.info("Navigation State Changed: ", {
       state,
       isAuthtenticated,
     });
@@ -27,7 +27,7 @@ const AppContent = () => {
 
   useEffect(() => {
     if (navigationRef.current?.isReady()) {
-      Logger.info('Navigation is ready.');
+      Logger.info("Navigation is ready.");
     }
   }, []);
 

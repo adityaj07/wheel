@@ -1,14 +1,28 @@
-import { StyleSheet, Text, View } from 'react-native'
-import React from 'react'
+import ROUTES from "@/routes/Routes";
+import OtpScreen from "@/screens/auth/OtpScreen";
+import PhoneNumberScreen from "@/screens/auth/PhoneNumberScreen";
+import {createNativeStackNavigator} from "@react-navigation/native-stack";
+import React, {lazy, Suspense} from "react";
+
+const otpScreen = lazy(() => import("@/screens/auth/OtpScreen"));
+
+const Stack = createNativeStackNavigator();
 
 const AuthStackNavigator = () => {
   return (
-    <View>
-      <Text>AuthStackNavigator</Text>
-    </View>
-  )
-}
+    <Suspense fallback={null}>
+      <Stack.Navigator
+        screenOptions={{
+          headerShown: false,
+        }}>
+        <Stack.Screen
+          name={ROUTES.PHONE_NUMBER}
+          component={PhoneNumberScreen}
+        />
+        <Stack.Screen name={ROUTES.OTP} component={OtpScreen} />
+      </Stack.Navigator>
+    </Suspense>
+  );
+};
 
-export default AuthStackNavigator
-
-const styles = StyleSheet.create({})
+export default AuthStackNavigator;
