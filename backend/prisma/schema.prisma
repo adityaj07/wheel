@@ -17,21 +17,6 @@ enum BookingStatus {
   REFUNDED
 }
 
-enum PaymentStatus {
-  PENDING
-  COMPLETED
-  FAILED
-  REFUNDED
-  PARTIALLY_REFUNDED
-}
-
-enum PaymentType {
-  BOOKING
-  SECURITY_DEPOSIT
-  EXTRA_CHARGES
-  REFUND
-}
-
 model User {
   id           String  @id @default(uuid())
   name         String
@@ -54,8 +39,6 @@ model User {
 
   refreshTokens RefreshToken[]
   bookings      Booking[]
-  reviews       Review[]
-  payments      Payment[]
 }
 
 model RefreshToken {
@@ -76,168 +59,65 @@ model RefreshToken {
   user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
-model VehicleCategory {
-  id          String  @id @default(uuid())
-  name        String  @unique
-  description String?
-
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
-  Vehicle   Vehicle[]
-}
-
-model Location {
-  id        String  @id @default(uuid())
-  name      String  @unique
-  address   String
-  city      String
-  state     String
-  zipCode   String
-  latitude  Float?
-  longitude Float?
-  isActive  Boolean @default(true)
+model VehicleType {
+  id       String    @id @default(uuid())
+  name     String    @unique
+  vehicles Vehicle[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-
-  vehicleLocations VehicleLocation[]
-  bookings         Booking[]
 }
 
 model Vehicle {
-  id     String  @id @default(uuid())
-  name   String
-  number String  @unique
-  model  String?
-  brand  String?
-  year   Int?
-  color  String?
-
-  images       Json?
-  primaryImage String?
-
-  pricePerDay Float
-  includedKm  Int   @default(0)
-  extraKmRate Float @default(0)
-
-  fuelType       String? // Petrol, Diesel, Electric
-  engineCapacity String?
-  mileage        String?
-
-  isAvailable Boolean @default(true)
-  isActive    Boolean @default(true)
+  id                 String  @id @default(uuid())
+  name               String
+  number             String  @unique
+  imageUrl           String
+  pricePerDay        Decimal
+  includedKmPerDay   Int
+  totalPriceFor2Days Decimal
+  includedKmFor2Days Int
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  categoryId String
-  category   VehicleCategory @relation(fields: [categoryId], references: [id])
+  locations VehicleLocation[]
+  bookings  Booking[]
 
-  vehicleLocations VehicleLocation[]
-  bookings         Booking[]
-  reviews          Review[]
+  vehicleTypeId String
+  vehicleType   VehicleType @relation(fields: [vehicleTypeId], references: [id])
+
+  @@index([vehicleTypeId])
 }
 
 model VehicleLocation {
-  id         String @id @default(uuid())
-  vehicleId  String
-  locationId String
+  id       String @id @default(uuid())
+  location String
 
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  vehicle  Vehicle  @relation(fields: [vehicleId], references: [id])
-  location Location @relation(fields: [locationId], references: [id])
-
-  @@unique([vehicleId, locationId])
+  vehicleId String
+  vehicle   Vehicle @relation(fields: [vehicleId], references: [id], onDelete: Cascade)
 }
 
 model Booking {
-  id            String @id @default(uuid())
-  bookingNumber String @unique @default(uuid())
-
-  startDate DateTime
-  endDate   DateTime
-  startTime String
-  endTime   String
-
-  totalPricing    Float
-  securityDeposit Float?
-  extraCharges    Float  @default(0) // for damages, extra km, etc
-
-  status BookingStatus @default(PENDING)
-
-  pickupLocation  String?
-  dropoffLocation String?
-  specialRequests String?
-
-  actualStartTime DateTime?
-  actualEndTime   DateTime?
-  totalKmRidden   Int?
+  id         String        @id @default(uuid())
+  startDate  DateTime
+  endDate    DateTime
+  startTime  String
+  endTime    String
+  location   String
+  totalPrice Decimal
+  status     BookingStatus @default(PENDING)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
   userId String
-  user   User   @relation(fields: [userId], references: [id])
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   vehicleId String
   vehicle   Vehicle @relation(fields: [vehicleId], references: [id])
 
-  locationId String
-  location   Location @relation(fields: [locationId], references: [id])
-
-  payments Payment[]
-  reviews  Review[]
-}
-
-model Payment {
-  id            String        @id @default(uuid())
-  amount        Float
-  currency      String        @default("INR")
-  paymentMethod String? // UPI, Card, etc
-  transactionId String? // external payment gateway trans ID
-  status        PaymentStatus @default(PENDING)
-  type          PaymentType   @default(BOOKING)
-
-  gatewayResponse Json?
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  bookingId String
-  booking   Booking @relation(fields: [bookingId], references: [id])
-
-  userId String
-  user   User   @relation(fields: [userId], references: [id])
-}
-
-model Review {
-  id      String  @id @default(uuid())
-  rating  Int
-  comment String?
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  userId String
-  user   User   @relation(fields: [userId], references: [id])
-
-  bookingId String
-  booking   Booking @relation(fields: [bookingId], references: [id])
-
-  vehicleId String
-  vehicle   Vehicle @relation(fields: [vehicleId], references: [id])
-
-  @@unique([userId, bookingId]) // only 1 review per user per booking
-}
-
-model Setting {
-  id        String   @id @default(uuid())
-  key       String   @unique
-  value     Json
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  @@map("settings")
+  @@index([userId])
+  @@index([vehicleId])
+  @@index([status])
 }
