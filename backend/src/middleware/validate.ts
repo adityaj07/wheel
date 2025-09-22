@@ -1,7 +1,7 @@
-import { StatusCodes } from "@/lib/statusCodes";
-import { AppError } from "@/utils/AppError";
-import type { NextFunction, RequestHandler } from "express";
-import { ZodError, type z, type ZodObject, type ZodRawShape } from "zod";
+import {StatusCodes} from "@/lib/statusCodes";
+import {AppError} from "@/utils/AppError";
+import type {NextFunction, RequestHandler} from "express";
+import {ZodError, type z, type ZodObject, type ZodRawShape} from "zod";
 
 type Schema = {
   body?: ZodObject<ZodRawShape>;
@@ -11,7 +11,7 @@ type Schema = {
 
 export const validate =
   <T extends Schema>(
-    schema: T
+    schema: T,
   ): RequestHandler<
     T["params"] extends ZodObject<ZodRawShape> ? z.infer<T["params"]> : any,
     any,
@@ -22,10 +22,14 @@ export const validate =
     try {
       if (schema.body)
         req.body = schema.body.parse(req.body) as typeof req.body;
-      if (schema.query)
-        req.query = schema.query.parse(req.query) as typeof req.query;
-      if (schema.params)
-        req.params = schema.params.parse(req.params) as typeof req.params;
+      if (schema.query) {
+        const parsedQuery = schema.query.parse(req.query);
+        Object.assign(req.query, parsedQuery);
+      }
+      if (schema.params) {
+        const parsedParams = schema.params.parse(req.params);
+        Object.assign(req.params, parsedParams);
+      }
 
       next();
     } catch (error) {
@@ -34,8 +38,8 @@ export const validate =
           new AppError(
             "Validation failed",
             StatusCodes.BAD_REQUEST.code,
-            error.issues
-          )
+            error.issues,
+          ),
         );
       }
 
