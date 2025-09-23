@@ -4,6 +4,7 @@ import {Router} from "express";
 
 const userRouter = Router({mergeParams: true});
 
-userRouter.get("/me", userController.me);
+userRouter.get("/me", requireAuth, userController.me);
+userRouter.get("/bookings", userController.getUserBookings);
 
 export default userRouter;

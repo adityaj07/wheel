@@ -1,17 +1,17 @@
 import {LIMIT_DEFAULT, PAGE_DEFAULT} from "@/constants/pagination";
 
-type QueryType = {
-  page?: string;
-  limit?: string;
+export type QueryType = {
+  page?: number; // we already parse thru zod and convert to number from string, hence number here
+  limit?: number;
 };
 
-type PaginationMetaInput = {
+export type PaginationMetaInput = {
   totalCount: number;
   page: number;
   limit: number;
 };
 
-type PaginationMetaType = {
+export type PaginationMetaType = {
   totalCount: number;
   page: number;
   limit: number;
@@ -19,14 +19,8 @@ type PaginationMetaType = {
 };
 
 export function getPaginationParams(query: QueryType) {
-  const page = Math.max(
-    parseInt(query.page || "") || PAGE_DEFAULT,
-    PAGE_DEFAULT,
-  );
-  const limit = Math.max(
-    parseInt(query.limit || "") || LIMIT_DEFAULT,
-    LIMIT_DEFAULT,
-  );
+  const page = Math.max(query.page || PAGE_DEFAULT, PAGE_DEFAULT);
+  const limit = Math.max(query.limit || LIMIT_DEFAULT, LIMIT_DEFAULT);
   const skip = (page - 1) * limit;
 
   return {page, limit, skip};

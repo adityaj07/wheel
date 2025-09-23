@@ -23,8 +23,6 @@ export const SearchVehicleBodySchema = z.object({
 
 export const SearchVehicleQuerySchema = z.object({
   location: z.string().optional(),
-  page: z.string().optional(),
-  limit: z.string().optional(),
 });
 
 export type SearchVehicleBodySchemaType = z.infer<

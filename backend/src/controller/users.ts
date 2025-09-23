@@ -1,8 +1,11 @@
 import {db} from "@/lib/db";
 import {StatusCodes} from "@/lib/statusCodes";
 import type {NoParams} from "@/types";
+import type {GetUserBookingsQuery} from "@/types/users";
 import {AppError} from "@/utils/AppError";
 import {asyncHandler} from "@/utils/asyncHandler";
+import {getPaginationMeta, getPaginationParams} from "@/utils/pagination";
+import type {Prisma} from "generated/prisma";
 
 export const me = asyncHandler<NoParams, NoParams, NoParams>(
   async (req, res) => {
@@ -78,3 +81,82 @@ export const me = asyncHandler<NoParams, NoParams, NoParams>(
     return res.status(StatusCodes.OK.code).json({user});
   },
 );
+
+export const getUserBookings = asyncHandler<
+  NoParams,
+  NoParams,
+  NoParams,
+  GetUserBookingsQuery
+>(async (req, res) => {
+  const userId = req.user?.sub;
+  if (!userId) {
+    throw new AppError("Unauthorized", StatusCodes.UNAUTHORIZED.code);
+  }
+
+  const {page, limit, skip} = getPaginationParams(req.query);
+  const {status, startDate, endDate} = req.query;
+
+  if (startDate && endDate) {
+    if (endDate <= startDate) {
+      throw new AppError(
+        "End date time must be after start date time",
+        StatusCodes.BAD_REQUEST.code,
+      );
+    }
+  }
+
+  const whereClause: Prisma.BookingWhereInput = {userId};
+
+  if (status) {
+    whereClause.status = status;
+  }
+
+  if (startDate) {
+    whereClause.startDate = {gte: new Date(startDate)};
+  }
+
+  if (endDate) {
+    whereClause.endDate = new Date(endDate);
+  }
+
+  const totalCount = await db.booking.count({where: whereClause});
+
+  const bookings = await db.booking.findMany({
+    where: whereClause,
+    include: {
+      vehicle: {
+        select: {
+          id: true,
+          name: true,
+          imageUrl: true,
+          vehicleType: {select: {name: true}},
+        },
+      },
+    },
+    skip,
+    take: limit,
+    orderBy: {startDate: "desc"},
+  });
+
+  const data = bookings.map(b => ({
+    id: b.id,
+    vehicle: {
+      id: b.vehicle.id,
+      name: b.vehicle.name,
+      imageUrl: b.vehicle.imageUrl,
+      type: b.vehicle.vehicleType.name,
+    },
+    location: b.location,
+    startDate: b.startDate.toISOString().split("T")[0],
+    startTime: b.startTime,
+    endDate: b.endDate.toISOString().split("T")[0],
+    endTime: b.endTime,
+    totalPrice: Number(b.totalPrice),
+    status: b.status,
+  }));
+
+  return res.status(StatusCodes.OK.code).json({
+    data,
+    ...getPaginationMeta({totalCount, page, limit}),
+  });
+});

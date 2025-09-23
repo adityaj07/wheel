@@ -4,6 +4,7 @@ import type {
 } from "@/schemas/vehicles";
 import type {Vehicle, VehicleLocation, VehicleType} from "generated/prisma";
 import {PaginationMeta} from "./index";
+import type {ReqQueryPagination} from "./common";
 
 type VehicleBase = Pick<
   Vehicle,
@@ -21,7 +22,8 @@ type VehicleDerived = {
 };
 
 export type SearchVehicleBody = SearchVehicleBodySchemaType;
-export type SearchVehicleQuery = SearchVehicleQuerySchemaType;
+export type SearchVehicleQuery = SearchVehicleQuerySchemaType &
+  ReqQueryPagination;
 
 export type VehicleResponseItem = VehicleBase & VehicleDerived;
 
