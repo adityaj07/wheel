@@ -19,7 +19,7 @@ import BottomTabNavigator from "./BottomTabNavigator";
 
 const AppContent = () => {
   const Stack = createNativeStackNavigator();
-  const {isAuthenticated, isLoading} = useAuth();
+  const {isAuthenticated} = useAuth();
 
   const handleStateChange = (state: NavigationState | undefined) => {
     Logger.info("Navigation State Changed: ", {
@@ -59,10 +59,6 @@ const AppContent = () => {
               name={ROUTES.BOOKCONFIRMATION}
               component={BookingConfirmationScreen}
             />
-            {/* <Stack.Screen
-              name={ROUTES.UPDATEPROFILE}
-              component={UpdateProfileScreen}
-            /> */}
             <Stack.Screen name={ROUTES.BOOKINGS} component={BookingScreen} />
           </>
         ) : (

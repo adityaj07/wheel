@@ -1,14 +1,6 @@
-import {api} from "@/api";
-import Icon from "@/components/common/Icon";
-
-import {CustomModal} from "@/components/common/CustomModal";
-import {useTheme} from "@/contexts/ThemeContext";
-import ROUTES from "@/routes/Routes";
-import {GetUserBookingsResponse} from "@/types/user";
-import {formatDate} from "@/utils/time";
 import {useNavigation} from "@react-navigation/native";
 import {NativeStackNavigationProp} from "@react-navigation/native-stack";
-import {useEffect, useState, type FC} from "react";
+import {FC, useState} from "react";
 import {
   ActivityIndicator,
   Image,
@@ -19,78 +11,38 @@ import {
 } from "react-native";
 import {Calendar} from "react-native-calendars";
 import {SafeAreaView} from "react-native-safe-area-context";
-import {toast} from "sonner-native";
 
-interface BookingScreenProps {}
+import {CustomModal} from "@/components/common/CustomModal";
+import Icon from "@/components/common/Icon";
+import {useBookings} from "@/contexts/BookingsContext";
+import {useTheme} from "@/contexts/ThemeContext";
+import ROUTES from "@/routes/Routes";
+import {formatDate} from "@/utils/time";
 
 type RootStackParamList = {
   [ROUTES.HOME]: undefined;
+  [ROUTES.MAIN_TABS]: undefined;
 };
 
 type BookingScreenNavigationProp =
   NativeStackNavigationProp<RootStackParamList>;
 
-type MyBookings = GetUserBookingsResponse["data"][0];
-
-const BookingScreen: FC<BookingScreenProps> = ({}) => {
-  const [bookings, setBookings] = useState<MyBookings[]>([]);
-  const [loading, setLoading] = useState<boolean>(true);
-  const [error, setError] = useState<string | null>(null);
-
-  const [status, setStatus] = useState<string | null>(null);
-  const [startDate, setStartDate] = useState<string | null>(null);
-  const [endDate, setEndDate] = useState<string | null>(null);
+const BookingScreen: FC = () => {
+  const navigation = useNavigation<BookingScreenNavigationProp>();
+  const {theme} = useTheme();
+  const {filteredBookings, loading, filters, setFilters} = useBookings();
 
   const [modals, setModals] = useState({
     showStartDate: false,
     showEndDate: false,
   });
 
-  const navigation = useNavigation<BookingScreenNavigationProp>();
-  const {theme} = useTheme();
-
   const toggleModal = (key: keyof typeof modals, value: boolean) => {
     setModals(prev => ({...prev, [key]: value}));
   };
 
-  const fetchBookings = async () => {
-    setLoading(true);
-    setError(null);
-    try {
-      const params: Record<string, string> = {};
-      if (status) params.status = status;
-      if (startDate) params.startDate = startDate;
-      if (endDate) params.endDate = endDate;
-
-      const response = await api.get("/users/bookings", {params});
-      setBookings(response.data.data);
-    } catch (error: any) {
-      const errorMessage =
-        error?.response?.data?.message ||
-        "Some error occurred while fetching your bookings";
-      toast.error(errorMessage);
-      setError(errorMessage);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    fetchBookings();
-  }, [status, startDate, endDate]);
-
-  if (loading) {
-    return (
-      <SafeAreaView
-        className="flex-1 justify-center items-center"
-        style={{backgroundColor: theme.bg}}>
-        <ActivityIndicator size="large" color={theme.primary} />
-        <Text className="text-lg mt-4" style={{color: theme.subText}}>
-          Loading your bookings...
-        </Text>
-      </SafeAreaView>
-    );
-  }
+  const clearFilters = () =>
+    setFilters({status: null, startDate: null, endDate: null});
 
   return (
     <SafeAreaView className="flex-1" style={{backgroundColor: theme.bg}}>
@@ -122,7 +74,9 @@ const BookingScreen: FC<BookingScreenProps> = ({}) => {
       </View>
 
       {/* Filters */}
-      <View className={`px-4 py-3 rounded-b-lg ${theme.surfaceMuted}`}>
+      <View
+        className={`px-4 py-3 rounded-lg mx-2 mt-3`}
+        style={{backgroundColor: theme.surfaceMuted}}>
         <Text
           className="text-base font-semibold mb-3"
           style={{color: theme.text}}>
@@ -132,11 +86,11 @@ const BookingScreen: FC<BookingScreenProps> = ({}) => {
         <View className="flex-row flex-wrap gap-3">
           {/* Status */}
           {["CONFIRMED", "PENDING", "CANCELLED"].map(option => {
-            const isSelected = status === option;
+            const isSelected = filters.status === option;
             return (
               <TouchableOpacity
                 key={option}
-                onPress={() => setStatus(isSelected ? null : option)}
+                onPress={() => setFilters({status: isSelected ? null : option})}
                 className="px-4 py-2 rounded-2xl border"
                 style={{
                   backgroundColor: isSelected
@@ -146,9 +100,7 @@ const BookingScreen: FC<BookingScreenProps> = ({}) => {
                 }}>
                 <Text
                   className="text-sm font-medium tracking-wide"
-                  style={{
-                    color: isSelected ? theme.primary : theme.text,
-                  }}>
+                  style={{color: isSelected ? theme.primary : theme.text}}>
                   {option.charAt(0) + option.slice(1).toLowerCase()}
                 </Text>
               </TouchableOpacity>
@@ -159,14 +111,13 @@ const BookingScreen: FC<BookingScreenProps> = ({}) => {
           <TouchableOpacity
             onPress={() => toggleModal("showStartDate", true)}
             className="px-4 py-2 rounded-2xl border"
-            style={{
-              backgroundColor: theme.surface,
-              borderColor: theme.border,
-            }}>
+            style={{backgroundColor: theme.surface, borderColor: theme.border}}>
             <Text
               className="text-sm font-medium tracking-wide"
               style={{color: theme.text}}>
-              {startDate ? `From: ${formatDate(startDate)}` : "Start Date"}
+              {filters.startDate
+                ? `From: ${formatDate(filters.startDate)}`
+                : "Start Date"}
             </Text>
           </TouchableOpacity>
 
@@ -174,25 +125,20 @@ const BookingScreen: FC<BookingScreenProps> = ({}) => {
           <TouchableOpacity
             onPress={() => toggleModal("showEndDate", true)}
             className="px-4 py-2 rounded-2xl border"
-            style={{
-              backgroundColor: theme.surface,
-              borderColor: theme.border,
-            }}>
+            style={{backgroundColor: theme.surface, borderColor: theme.border}}>
             <Text
               className="text-sm font-medium tracking-wide"
               style={{color: theme.text}}>
-              {endDate ? `To: ${formatDate(endDate)}` : "End Date"}
+              {filters.endDate
+                ? `To: ${formatDate(filters.endDate)}`
+                : "End Date"}
             </Text>
           </TouchableOpacity>
 
           {/* Clear Filters */}
-          {(status || startDate || endDate) && (
+          {(filters.status || filters.startDate || filters.endDate) && (
             <TouchableOpacity
-              onPress={() => {
-                setStatus(null);
-                setStartDate(null);
-                setEndDate(null);
-              }}
+              onPress={clearFilters}
               className="px-4 py-2 rounded-2xl border flex-row items-center"
               style={{
                 backgroundColor: theme.surface,
@@ -208,13 +154,16 @@ const BookingScreen: FC<BookingScreenProps> = ({}) => {
         </View>
       </View>
 
-      {/* Content */}
+      {/* Bookings Content */}
       <ScrollView className="p-4">
-        {error ? (
-          <Text className="text-center text-lg" style={{color: theme.error}}>
-            {error}
-          </Text>
-        ) : bookings.length === 0 ? (
+        {loading ? (
+          <View className="flex-1 justify-center items-center py-12">
+            <ActivityIndicator size="large" color={theme.primary} />
+            <Text className="text-lg mt-4" style={{color: theme.subText}}>
+              Loading your bookings...
+            </Text>
+          </View>
+        ) : filteredBookings.length === 0 ? (
           <View className="flex-1 items-center justify-center py-12">
             <Image
               source={{
@@ -234,7 +183,7 @@ const BookingScreen: FC<BookingScreenProps> = ({}) => {
               Looks like you haven’t booked a ride yet. Start your journey now!
             </Text>
             <TouchableOpacity
-              onPress={() => navigation.navigate("Home")}
+              onPress={() => navigation.navigate(ROUTES.MAIN_TABS)}
               className="py-3 px-10 rounded-full shadow-lg active:opacity-80"
               style={{backgroundColor: theme.primary}}>
               <Text
@@ -245,7 +194,7 @@ const BookingScreen: FC<BookingScreenProps> = ({}) => {
             </TouchableOpacity>
           </View>
         ) : (
-          bookings.map((booking, index) => (
+          filteredBookings.map((booking, index) => (
             <View
               key={index}
               className="rounded-3xl p-5 mb-6"
@@ -255,7 +204,6 @@ const BookingScreen: FC<BookingScreenProps> = ({}) => {
                 borderWidth: 1,
                 ...theme.shadow,
               }}>
-              {/* Vehicle Image */}
               <Image
                 source={{
                   uri:
@@ -265,8 +213,6 @@ const BookingScreen: FC<BookingScreenProps> = ({}) => {
                 className="w-full h-48 rounded-2xl mb-4"
                 resizeMode="cover"
               />
-
-              {/* Vehicle Name + Price */}
               <View className="flex-row justify-between items-center">
                 <Text className="text-xl font-bold" style={{color: theme.text}}>
                   {booking.vehicle.name || "Unknown Vehicle"}
@@ -277,8 +223,6 @@ const BookingScreen: FC<BookingScreenProps> = ({}) => {
                   ₹{Number(booking.totalPrice).toFixed(2)}
                 </Text>
               </View>
-
-              {/* Dates */}
               <View
                 className="mt-3 p-3 rounded-xl"
                 style={{backgroundColor: theme.surfaceMuted}}>
@@ -289,13 +233,9 @@ const BookingScreen: FC<BookingScreenProps> = ({}) => {
                   📅 To: {formatDate(booking.endDate)} {booking.endTime}
                 </Text>
               </View>
-
-              {/* Location */}
               <Text className="text-base mt-3" style={{color: theme.text}}>
                 📍 {booking.location}
               </Text>
-
-              {/* Status Badge */}
               <View className="mt-4 flex-row">
                 <Text
                   className="px-4 py-1 rounded-full text-sm font-semibold"
@@ -327,12 +267,17 @@ const BookingScreen: FC<BookingScreenProps> = ({}) => {
         }>
         <Calendar
           onDayPress={day => {
-            setStartDate(day.dateString);
+            setFilters({startDate: day.dateString});
             toggleModal("showStartDate", false);
           }}
           markedDates={
-            startDate
-              ? {[startDate]: {selected: true, selectedColor: theme.primary}}
+            filters.startDate
+              ? {
+                  [filters.startDate]: {
+                    selected: true,
+                    selectedColor: theme.primary,
+                  },
+                }
               : {}
           }
           minDate={new Date().toISOString().split("T")[0]}
@@ -358,15 +303,20 @@ const BookingScreen: FC<BookingScreenProps> = ({}) => {
         }>
         <Calendar
           onDayPress={day => {
-            setEndDate(day.dateString);
+            setFilters({endDate: day.dateString});
             toggleModal("showEndDate", false);
           }}
           markedDates={
-            endDate
-              ? {[endDate]: {selected: true, selectedColor: theme.primary}}
+            filters.endDate
+              ? {
+                  [filters.endDate]: {
+                    selected: true,
+                    selectedColor: theme.primary,
+                  },
+                }
               : {}
           }
-          minDate={startDate || new Date().toISOString().split("T")[0]}
+          minDate={filters.startDate || new Date().toISOString().split("T")[0]}
           theme={{
             calendarBackground: theme.bg,
             dayTextColor: theme.text,
