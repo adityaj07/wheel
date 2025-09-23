@@ -7,8 +7,7 @@
     "ios": "react-native run-ios",
     "lint": "eslint .",
     "start": "react-native start",
-    "test": "jest",
-    "dev": "concurrently -n \"app,android,backend,db\" -c \"blue,green,yellow,magenta\" \"bun run start\" \"bun run android\" \"cd backend && bun run dev\" \"bun run db:studio:local\""
+    "test": "jest"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.2.2",
@@ -40,6 +39,7 @@
     "react-hook-form": "^7.63.0",
     "react-native": "0.79.0",
     "react-native-calendars": "^1.1313.0",
+    "react-native-confetti-cannon": "^1.5.2",
     "react-native-gesture-handler": "^2.28.0",
     "react-native-haptic-feedback": "^2.3.3",
     "react-native-linear-gradient": "^2.8.3",

@@ -10,7 +10,9 @@ import {
 
 import {useAuth} from "@/contexts/AuthContext";
 import ROUTES from "@/routes/Routes";
-import SearchScreen from "@/screens/SearchScreen";
+import BookingConfirmationScreen from "@/screens/booking/BookingConfirmationScreen";
+import RideConfirmationScreen from "@/screens/booking/RideConfirmationScreen";
+import SearchScreen from "@/screens/search/SearchScreen";
 import AuthStackNavigator from "./AuthStackNavigator";
 import BottomTabNavigator from "./BottomTabNavigator";
 
@@ -48,6 +50,22 @@ const AppContent = () => {
               component={BottomTabNavigator}
             />
             <Stack.Screen name={ROUTES.SEARCH} component={SearchScreen} />
+            <Stack.Screen
+              name={ROUTES.RIDECONFIRMATION}
+              component={RideConfirmationScreen}
+            />
+            <Stack.Screen
+              name={ROUTES.BOOKCONFIRMATION}
+              component={BookingConfirmationScreen}
+            />
+            {/* <Stack.Screen
+              name={ROUTES.UPDATEPROFILE}
+              component={UpdateProfileScreen}
+            />
+             <Stack.Screen
+              name={ROUTES.BOOKINGS}
+              component={Booking}
+            /> */}
           </>
         ) : (
           <Stack.Screen name={ROUTES.ROOT} component={AuthStackNavigator} />

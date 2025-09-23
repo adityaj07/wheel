@@ -127,6 +127,7 @@ export const create = asyncHandler<NoParams, NoParams, CreateBookingBody>(
       endTime,
       totalPrice: calculatedPrice,
       status: newBooking.status,
+      createdAt: newBooking.createdAt,
     };
 
     return res.status(StatusCodes.CREATED.code).json({data: result});

@@ -25,15 +25,18 @@ export const COLORS = {
   lightTheme: {
     bg: "#FAFAF9",
     card: "#FFFFFF",
+    surface: "#FFFFFF",
+    surfaceMuted: "#F4F4F5",
     text: "#111827",
     subText: "#6B7280",
     placeholder: "#9CA3AF",
     primary: "#FACC15",
-    primaryDark: "#EAB308", // add this
-    onPrimary: "#111827", // or "#fff" depending on contrast
-    error: "#EF4444", // add error color
+    primaryDark: "#EAB308",
+    onPrimary: "#111827",
+    error: "#EF4444",
     border: "#D1D5DB",
-    surface: "#FFFFFF",
+    success: "#22C55E",
+    warning: "#F59E0B",
     shadow: {
       shadowColor: "#000",
       shadowOffset: {width: 0, height: 1},
@@ -47,15 +50,18 @@ export const COLORS = {
   darkTheme: {
     bg: "#0F0F0F",
     card: "#1C1C1C",
+    surface: "#262626",
+    surfaceMuted: "#2E2E2E",
     text: "#F5F5F5",
     subText: "#9CA3AF",
     placeholder: "#6B7280",
     primary: "#EAB308",
-    primaryDark: "#FACC15", // optional, for gradient buttons
-    onPrimary: "#0F0F0F", // contrast text for primary bg
+    primaryDark: "#FACC15",
+    onPrimary: "#0F0F0F",
     error: "#EF4444",
     border: "#2C2C2C",
-    surface: "#262626",
+    success: "#22C55E",
+    warning: "#F59E0B",
     shadow: {
       shadowColor: "#000",
       shadowOffset: {width: 0, height: 1},
