@@ -9,3 +9,10 @@ export type ApiResponse<T = unknown> = {
     details?: unknown;
   };
 };
+
+export type PaginationMeta = {
+  page: number;
+  limit: number;
+  totalCount: number;
+  totalPages: number;
+};

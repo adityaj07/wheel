@@ -3,13 +3,7 @@ import type {
   SearchVehicleQuerySchemaType,
 } from "@/schemas/vehicles";
 import type {Vehicle, VehicleLocation, VehicleType} from "generated/prisma";
-
-export type PaginationMeta = {
-  page: number;
-  limit: number;
-  totalCount: number;
-  totalPages: number;
-};
+import {PaginationMeta} from "./index";
 
 type VehicleBase = Pick<
   Vehicle,
