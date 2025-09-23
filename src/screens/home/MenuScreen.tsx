@@ -9,10 +9,12 @@ import {
   Wallet,
   X,
 } from "lucide-react-native";
-import React from "react";
+import React, {useState} from "react";
 import {ScrollView, Text, TouchableOpacity, View} from "react-native";
 import {SafeAreaView} from "react-native-safe-area-context";
 
+import {ConfirmDialog} from "@/components/common/ConfirmDialog";
+import MenuItem from "@/components/home/MenuItem";
 import {useAuth} from "@/contexts/AuthContext";
 import {useTheme} from "@/contexts/ThemeContext";
 import {NativeStackNavigationProp} from "@react-navigation/native-stack";
@@ -23,6 +25,7 @@ type RootStackParamList = {
 };
 
 const MenuScreen = () => {
+  const [confirmLogoutVisible, setConfirmLogoutVisible] = useState(false);
   const {logout, user} = useAuth();
   const {isDark, theme} = useTheme();
   const navigation =
@@ -89,13 +92,11 @@ const MenuScreen = () => {
             label="My Bookings"
             icon={<CheckCheck size={22} color={theme.text} />}
             onPress={handleMyBookings}
-            theme={theme}
           />
 
           <MenuItem
             label="Saved Addresses"
             icon={<MapPin size={22} color={theme.text} />}
-            theme={theme}
           />
 
           <View
@@ -117,7 +118,6 @@ const MenuScreen = () => {
           <MenuItem
             label="Help & Support"
             icon={<HelpCircle size={22} color={theme.text} />}
-            theme={theme}
           />
         </View>
 
@@ -130,24 +130,34 @@ const MenuScreen = () => {
           <MenuItem
             label="Cancellation Policy"
             icon={<X size={22} color={theme.text} />}
-            theme={theme}
           />
           <MenuItem
             label="Terms & Conditions"
             icon={<FileText size={22} color={theme.text} />}
-            theme={theme}
           />
           <MenuItem
             label="Privacy Policy"
             icon={<Shield size={22} color={theme.text} />}
-            theme={theme}
           />
           <MenuItem
             label="Logout"
-            onPress={logout}
+            onPress={() => {
+              setConfirmLogoutVisible(true);
+            }}
             icon={<LogOut size={22} color={theme.error} />}
             textColor={theme.error}
-            theme={theme}
+          />
+
+          <ConfirmDialog
+            visible={confirmLogoutVisible}
+            title="Logout"
+            description="Are you sure you want to logout?"
+            onCancel={() => setConfirmLogoutVisible(false)}
+            onConfirm={async () => {
+              setConfirmLogoutVisible(false);
+              await logout();
+            }}
+            confirmText="Logout"
           />
         </View>
       </ScrollView>
@@ -156,28 +166,3 @@ const MenuScreen = () => {
 };
 
 export default MenuScreen;
-
-type MenuItemProps = {
-  label: string;
-  icon: React.ReactNode;
-  theme: any;
-  onPress?: () => void;
-  textColor?: string;
-};
-
-const MenuItem = ({label, icon, theme, onPress, textColor}: MenuItemProps) => {
-  return (
-    <TouchableOpacity
-      onPress={onPress}
-      activeOpacity={0.8}
-      style={{backgroundColor: theme.card, ...theme.shadow}}
-      className="flex-row justify-between items-center p-4 rounded-2xl mb-3">
-      <Text
-        style={{color: textColor || theme.text}}
-        className="text-lg font-medium">
-        {label}
-      </Text>
-      {icon}
-    </TouchableOpacity>
-  );
-};

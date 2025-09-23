@@ -5,12 +5,10 @@ import {HorizontalBikeList} from "@/components/home/HorizontalBikeList";
 import {PromoBanner} from "@/components/home/PromoBanner";
 import {SectionHeader} from "@/components/home/SectionHeader";
 import {BIKE_CATEGORIES, TOP_PICKS} from "@/constants/home";
-import {useAuth} from "@/contexts/AuthContext";
 import {useTheme} from "@/contexts/ThemeContext";
 import {useBooking} from "@/hooks/useBooking";
 import ROUTES from "@/routes/Routes";
 import type {RootStackParamList} from "@/routes/types";
-import {BikeModel} from "@/types/home";
 import Ionicons from "@react-native-vector-icons/ionicons";
 import {useNavigation} from "@react-navigation/native";
 import type {NativeStackNavigationProp} from "@react-navigation/native-stack";
@@ -40,8 +38,7 @@ const HomeScreen = () => {
     pickupTimeSlots,
     dropoffTimeSlots,
   } = useBooking();
-  const {logout} = useAuth();
-  const {isDark, theme} = useTheme();
+  const {theme} = useTheme();
 
   const handleLocationPress = useCallback(() => {
     Alert.alert("Location", "Location selection coming soon!");
@@ -71,24 +68,8 @@ const HomeScreen = () => {
     }
   }, [bookingData, isSearchDisabled]);
 
-  const handleBikePress = useCallback((bike: BikeModel) => {
-    Alert.alert("Bike Selected", `You selected ${bike.name}`);
-  }, []);
-
-  const handleCategoryPress = useCallback((category: any) => {
-    Alert.alert("Category", `You selected ${category.name}`);
-  }, []);
-
-  const handleViewAllPress = useCallback(() => {
-    Alert.alert("View All", "View all bikes coming soon!");
-  }, []);
-
-  const handlePromoPress = useCallback(() => {
-    Alert.alert("Promo", "Promo details coming soon!");
-  }, []);
-
   return (
-    <SafeAreaView className="flex-1" style={{backgroundColor: theme.bg}}>
+    <SafeAreaView className="flex-1 pb-20" style={{backgroundColor: theme.bg}}>
       {/* Header */}
       <Header
         location="Mira-Bhayandar"
@@ -120,7 +101,6 @@ const HomeScreen = () => {
         <View className="mt-8">
           <HorizontalBikeList
             bikes={BIKE_CATEGORIES}
-            onBikePress={handleCategoryPress}
             cardWidth="w-48"
             showShadow={true}
           />
@@ -128,24 +108,16 @@ const HomeScreen = () => {
 
         {/* Promo Banner */}
         <View className="mt-8 px-4">
-          <PromoBanner
-            imageUrl="https://d36g7qg6pk2cm7.cloudfront.net/assets/RBX-offer-194940429645abdee50c6e6711844bb4c8554a72c9c46a339ce202888c57e5d9.jpg"
-            onPress={handlePromoPress}
-          />
+          <PromoBanner imageUrl="https://d36g7qg6pk2cm7.cloudfront.net/assets/RBX-offer-194940429645abdee50c6e6711844bb4c8554a72c9c46a339ce202888c57e5d9.jpg" />
         </View>
 
         {/* Top Picks */}
         <View className="mt-10 px-4">
-          <SectionHeader
-            title="User's Top Picks"
-            actionText="VIEW ALL"
-            onActionPress={handleViewAllPress}
-          />
+          <SectionHeader title="User's Top Picks" actionText="VIEW ALL" />
         </View>
         <View className="mt-3">
           <HorizontalBikeList
             bikes={TOP_PICKS}
-            onBikePress={handleBikePress}
             cardWidth="w-44"
             showShadow={true}
           />
