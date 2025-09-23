@@ -33,6 +33,7 @@ export const COLORS = {
     onPrimary: "#111827", // or "#fff" depending on contrast
     error: "#EF4444", // add error color
     border: "#D1D5DB",
+    surface: "#FFFFFF",
     shadow: {
       shadowColor: "#000",
       shadowOffset: {width: 0, height: 1},
@@ -54,6 +55,7 @@ export const COLORS = {
     onPrimary: "#0F0F0F", // contrast text for primary bg
     error: "#EF4444",
     border: "#2C2C2C",
+    surface: "#262626",
     shadow: {
       shadowColor: "#000",
       shadowOffset: {width: 0, height: 1},

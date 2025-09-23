@@ -1,3 +1,4 @@
+import {useTheme} from "@/contexts/ThemeContext";
 import Ionicons from "@react-native-vector-icons/ionicons";
 import React from "react";
 import {Text, TouchableOpacity, View} from "react-native";
@@ -20,31 +21,59 @@ export const DateTimePicker: React.FC<DateTimePickerProps> = ({
   onTimePress,
   formatDate,
   formatTime,
-}) => (
-  <View className="mb-4">
-    <Text className="font-semibold mb-2">{label}</Text>
-    <View className="flex-row gap-2">
-      <TouchableOpacity
-        onPress={onDatePress}
-        className="flex-1 flex-row items-center border border-gray-200 rounded-lg px-3 py-2 bg-white"
-        accessibilityLabel={`Select ${label.toLowerCase()} date`}
-        accessibilityRole="button">
-        <Ionicons name="calendar-outline" size={18} color="gray" />
-        <Text className="ml-2 text-sm text-gray-700">
-          {formatDate(dateValue)}
-        </Text>
-      </TouchableOpacity>
+}) => {
+  const {theme} = useTheme();
 
-      <TouchableOpacity
-        onPress={onTimePress}
-        className="flex-1 flex-row items-center border border-gray-200 rounded-lg px-3 py-2 bg-white"
-        accessibilityLabel={`Select ${label.toLowerCase()} time`}
-        accessibilityRole="button">
-        <Ionicons name="time-outline" size={18} color="gray" />
-        <Text className="ml-2 text-sm text-gray-700">
-          {formatTime(timeValue)}
-        </Text>
-      </TouchableOpacity>
+  return (
+    <View className="mb-4">
+      <Text className="font-semibold mb-2" style={{color: theme.subText}}>
+        {label}
+      </Text>
+      <View className="flex-row gap-2">
+        <TouchableOpacity
+          onPress={onDatePress}
+          style={{
+            flex: 1,
+            flexDirection: "row",
+            alignItems: "center",
+            borderWidth: 1,
+            borderColor: theme.border,
+            borderRadius: 12,
+            paddingHorizontal: 12,
+            paddingVertical: 8,
+            backgroundColor: theme.surface,
+          }}
+          accessibilityLabel={`Select ${label.toLowerCase()} date`}
+          accessibilityRole="button"
+          activeOpacity={0.8}>
+          <Ionicons name="calendar-outline" size={18} color={theme.subText} />
+          <Text style={{marginLeft: 8, color: theme.text, fontSize: 14}}>
+            {formatDate(dateValue)}
+          </Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          onPress={onTimePress}
+          style={{
+            flex: 1,
+            flexDirection: "row",
+            alignItems: "center",
+            borderWidth: 1,
+            borderColor: theme.border,
+            borderRadius: 12,
+            paddingHorizontal: 12,
+            paddingVertical: 8,
+            backgroundColor: theme.surface,
+          }}
+          accessibilityLabel={`Select ${label.toLowerCase()} time`}
+          accessibilityRole="button"
+          activeOpacity={0.8}>
+          <Ionicons name="time-outline" size={18} color={theme.subText} />
+          <Text style={{marginLeft: 8, color: theme.text, fontSize: 14}}>
+            {formatTime(timeValue)}
+          </Text>
+        </TouchableOpacity>
+      </View>
     </View>
-  </View>
-);
+  );
+};

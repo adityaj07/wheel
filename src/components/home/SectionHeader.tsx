@@ -1,3 +1,4 @@
+import {useTheme} from "@/contexts/ThemeContext";
 import React from "react";
 import {Text, TouchableOpacity, View} from "react-native";
 
@@ -11,15 +12,29 @@ export const SectionHeader: React.FC<SectionHeaderProps> = ({
   title,
   actionText,
   onActionPress,
-}) => (
-  <View className="flex-row items-center justify-between px-4 mt-10 mb-4">
-    <Text className="text-xl font-bold text-gray-900">{title}</Text>
-    {actionText && onActionPress && (
-      <TouchableOpacity onPress={onActionPress}>
-        <Text className="text-sm font-semibold text-yellow-600">
-          {actionText}
-        </Text>
-      </TouchableOpacity>
-    )}
-  </View>
-);
+}) => {
+  const {theme} = useTheme();
+
+  return (
+    <View
+      style={{
+        flexDirection: "row",
+        alignItems: "center",
+        justifyContent: "space-between",
+        paddingHorizontal: 16,
+        marginTop: 24,
+        marginBottom: 12,
+      }}>
+      <Text style={{fontSize: 20, fontWeight: "700", color: theme.text}}>
+        {title}
+      </Text>
+      {actionText && onActionPress && (
+        <TouchableOpacity onPress={onActionPress} activeOpacity={0.7}>
+          <Text style={{fontSize: 14, fontWeight: "600", color: theme.primary}}>
+            {actionText}
+          </Text>
+        </TouchableOpacity>
+      )}
+    </View>
+  );
+};

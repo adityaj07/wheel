@@ -13,7 +13,7 @@ type failedQueueType = {
   config: AxiosRequestConfig;
 };
 
-const API_BASE_URL =
+export const API_BASE_URL =
   process.env.REACT_NATIVE_API_BASE_URL || "http://192.168.31.136:3000/api/v1";
 
 let isRefreshing = false;

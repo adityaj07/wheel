@@ -1,5 +1,5 @@
-import type {NativeStackScreenProps} from '@react-navigation/native-stack';
-import ROUTES from './Routes';
+import type {NativeStackScreenProps} from "@react-navigation/native-stack";
+import ROUTES from "./Routes";
 
 export type RootStackParamList = {
   [ROUTES.ROOT]: undefined;
@@ -9,7 +9,12 @@ export type RootStackParamList = {
   [ROUTES.HOME]: undefined;
   [ROUTES.SUBSCRIPTION]: undefined;
   [ROUTES.MENU]: undefined;
-  [ROUTES.SEARCH]: undefined;
+  [ROUTES.SEARCH]: {
+    pickupDate: string;
+    pickupTime: string;
+    dropoffDate: string;
+    dropoffTime: string;
+  };
   [ROUTES.OTP]: undefined;
   [ROUTES.PHONE_NUMBER]: undefined;
   [ROUTES.RIDECONFIRMATION]: undefined;

@@ -1,3 +1,4 @@
+import {useTheme} from "@/contexts/ThemeContext";
 import {BookingData} from "@/types/home";
 import {formatDate, formatTime} from "@/utils/time";
 import React from "react";
@@ -22,45 +23,68 @@ export const BookingForm: React.FC<BookingFormProps> = ({
   onDropoffTimePress,
   onSearch,
   isSearchDisabled = false,
-}) => (
-  <View className="px-4 mt-6">
-    <Text className="text-2xl font-extrabold mb-4 text-gray-900">
-      Book now, Ride Anywhere
-    </Text>
+}) => {
+  const {theme} = useTheme();
 
-    <View className="bg-white rounded-2xl shadow-lg border border-yellow-300 p-4">
-      <DateTimePicker
-        label="Pick up"
-        dateValue={bookingData.pickupDate}
-        timeValue={bookingData.pickupTime}
-        onDatePress={onPickupDatePress}
-        onTimePress={onPickupTimePress}
-        formatDate={formatDate}
-        formatTime={formatTime}
-      />
+  return (
+    <View className="mt-6">
+      <Text
+        className="text-2xl font-extrabold mb-4"
+        style={{color: theme.text}}>
+        Book now, Ride Anywhere
+      </Text>
 
-      <DateTimePicker
-        label="Drop Off"
-        dateValue={bookingData.dropoffDate}
-        timeValue={bookingData.dropoffTime}
-        onDatePress={onDropoffDatePress}
-        onTimePress={onDropoffTimePress}
-        formatDate={formatDate}
-        formatTime={formatTime}
-      />
+      <View
+        style={[
+          {
+            backgroundColor: theme.card,
+            borderColor: theme.border,
+            borderRadius: 20,
+            padding: 16,
+          },
+          theme.shadow,
+        ]}>
+        <DateTimePicker
+          label="Pick up"
+          dateValue={bookingData.pickupDate}
+          timeValue={bookingData.pickupTime}
+          onDatePress={onPickupDatePress}
+          onTimePress={onPickupTimePress}
+          formatDate={formatDate}
+          formatTime={formatTime}
+        />
 
-      <TouchableOpacity
-        onPress={onSearch}
-        disabled={isSearchDisabled}
-        className={`mt-4 py-4 rounded-full ${
-          isSearchDisabled ? "bg-yellow-200" : "bg-yellow-400"
-        }`}
-        accessibilityLabel="Search for available bikes"
-        accessibilityRole="button">
-        <Text className="text-center text-black font-bold text-lg tracking-wide">
-          SEARCH
-        </Text>
-      </TouchableOpacity>
+        <DateTimePicker
+          label="Drop Off"
+          dateValue={bookingData.dropoffDate}
+          timeValue={bookingData.dropoffTime}
+          onDatePress={onDropoffDatePress}
+          onTimePress={onDropoffTimePress}
+          formatDate={formatDate}
+          formatTime={formatTime}
+        />
+
+        <TouchableOpacity
+          onPress={onSearch}
+          disabled={isSearchDisabled}
+          style={{
+            marginTop: 16,
+            paddingVertical: 14,
+            borderRadius: 999,
+            backgroundColor: isSearchDisabled
+              ? theme.primaryDark + "66"
+              : theme.primary,
+          }}
+          accessibilityLabel="Search for available bikes"
+          accessibilityRole="button"
+          activeOpacity={0.8}>
+          <Text
+            className="text-center font-bold text-lg tracking-wide"
+            style={{color: theme.onPrimary}}>
+            SEARCH
+          </Text>
+        </TouchableOpacity>
+      </View>
     </View>
-  </View>
-);
+  );
+};

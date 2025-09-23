@@ -22,7 +22,6 @@ export const HorizontalBikeList: React.FC<HorizontalBikeListProps> = ({
     keyExtractor={item => item.id}
     showsHorizontalScrollIndicator={false}
     contentContainerStyle={{paddingHorizontal: 16, paddingBottom: 12}}
-    ItemSeparatorComponent={() => <></>}
     renderItem={({item}) => (
       <BikeCard
         bike={item}

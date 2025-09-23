@@ -10,7 +10,7 @@ import {
 
 import {useAuth} from "@/contexts/AuthContext";
 import ROUTES from "@/routes/Routes";
-import {Text} from "react-native";
+import SearchScreen from "@/screens/SearchScreen";
 import AuthStackNavigator from "./AuthStackNavigator";
 import BottomTabNavigator from "./BottomTabNavigator";
 
@@ -42,10 +42,13 @@ const AppContent = () => {
           headerShown: false,
         }}>
         {isAuthenticated ? (
-          <Stack.Screen
-            name={ROUTES.MAIN_TABS}
-            component={BottomTabNavigator}
-          />
+          <>
+            <Stack.Screen
+              name={ROUTES.MAIN_TABS}
+              component={BottomTabNavigator}
+            />
+            <Stack.Screen name={ROUTES.SEARCH} component={SearchScreen} />
+          </>
         ) : (
           <Stack.Screen name={ROUTES.ROOT} component={AuthStackNavigator} />
         )}
