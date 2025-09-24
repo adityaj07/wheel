@@ -53,24 +53,12 @@ const BookingScreen: FC = () => {
         <TouchableOpacity
           onPress={() => navigation.goBack()}
           className="p-2 rounded-full active:opacity-70">
-          <Icon
-            type="ion"
-            name="chevron-back"
-            size={26}
-            color={theme.onPrimary}
-          />
+          <Icon type="ion" name="chevron-back" size={26} color={theme.text} />
         </TouchableOpacity>
-        <Text
-          className="text-2xl font-extrabold"
-          style={{color: theme.onPrimary}}>
+        <Text className="text-2xl font-extrabold" style={{color: theme.text}}>
           My Bookings
         </Text>
-        <Icon
-          type="ion"
-          name="checkmark-done"
-          size={26}
-          color={theme.onPrimary}
-        />
+        <Icon type="ion" name="checkmark-done" size={26} color={theme.text} />
       </View>
 
       {/* Filters */}

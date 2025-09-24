@@ -1,3 +1,4 @@
+import {IMAGES} from "@/assets/images";
 import ROUTES from "@/routes/Routes";
 import {useNavigation} from "@react-navigation/native";
 import {NativeStackNavigationProp} from "@react-navigation/native-stack";
@@ -36,9 +37,9 @@ const SplashScreen = () => {
 
       {/* Centered Logo */}
       <View className="flex-1 justify-center items-center">
-        <View className="bg-white rounded-3xl p-6 shadow-lg">
+        <View className="bg-white rounded-full p-6 shadow-lg">
           <Image
-            source={{uri: "https://dummyimage.com/150x150/000/fff&text=Wheel"}}
+            source={IMAGES.wheelLogo}
             className="w-36 h-36"
             resizeMode="contain"
           />

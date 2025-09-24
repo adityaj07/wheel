@@ -1,3 +1,4 @@
+import {IMAGES} from "@/assets/images";
 import {useTheme} from "@/contexts/ThemeContext";
 import ROUTES from "@/routes/Routes";
 import {useNavigation} from "@react-navigation/native";
@@ -26,9 +27,9 @@ const ChooseLoginSignupScreen = () => {
       />
 
       {/* Logo */}
-      <View className="flex-row justify-center mt-20 mb-12">
+      <View className="flex-row justify-center mt-20 mb-12 bg-white p-4 rounded-full w-32 h-32 mx-auto shadow-lg">
         <Image
-          source={{uri: "https://dummyimage.com/100x100/000/fff&text=W"}}
+          source={IMAGES.wheelLogo}
           className="w-24 h-24"
           resizeMode="contain"
         />
