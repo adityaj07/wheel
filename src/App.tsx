@@ -1,6 +1,7 @@
 import {useTheme} from "@/contexts/ThemeContext";
 import {StatusBar} from "react-native";
 
+import {useEffect, useState} from "react";
 import {GestureHandlerRootView} from "react-native-gesture-handler";
 import {useAuth} from "./contexts/AuthContext";
 import "./global.css";
@@ -11,15 +12,16 @@ import SplashScreen from "./screens/auth/SplashScreen";
 function AppContent() {
   const {statusBarStyle, theme} = useTheme();
   const {isLoading, isAuthenticated} = useAuth();
+  const [showSplash, setShowSplash] = useState(true);
 
-  console.log(
-    "AppContent: isLoading=",
-    isLoading,
-    "isAuthenticated=",
-    isAuthenticated,
-  );
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setShowSplash(false);
+    }, 1200); // 1.2 seconds
+    return () => clearTimeout(timer);
+  }, []);
 
-  if (isLoading) {
+  if (isLoading || showSplash) {
     return <SplashScreen />;
   }
 
