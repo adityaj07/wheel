@@ -1,4 +1,4 @@
-import {BookingStatus} from "generated/prisma";
+import {BookingStatus} from "generated/prisma/index.js";
 import z from "zod";
 
 export const GetUserBookingsQuerySchema = z.object({

@@ -2,7 +2,11 @@ import type {
   SearchVehicleBodySchemaType,
   SearchVehicleQuerySchemaType,
 } from "@/schemas/vehicles";
-import type {Vehicle, VehicleLocation, VehicleType} from "generated/prisma";
+import type {
+  Vehicle,
+  VehicleLocation,
+  VehicleType,
+} from "generated/prisma/index.js";
 import {PaginationMeta} from "./index";
 import type {ReqQueryPagination} from "./common";
 

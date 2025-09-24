@@ -5,7 +5,7 @@ import type {GetUserBookingsQuery} from "@/types/users";
 import {AppError} from "@/utils/AppError";
 import {asyncHandler} from "@/utils/asyncHandler";
 import {getPaginationMeta, getPaginationParams} from "@/utils/pagination";
-import type {Prisma} from "generated/prisma";
+import type {Prisma} from "generated/prisma/index.js";
 
 export const me = asyncHandler<NoParams, NoParams, NoParams>(
   async (req, res) => {

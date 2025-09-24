@@ -4,10 +4,10 @@
   "type": "module",
   "private": true,
   "scripts": {
-    "build": "tsc",
+    "build": "tsc -b && tsc-alias -p tsconfig-alias.json && tsc-esm-fix --target=dist",
+    "start": "dotenv -e .env -- node dist/index.js",
     "build:watch": "tsc --watch",
     "dev": "dotenv -e .env.local -- bun run --hot src/index.ts",
-    "start": "dotenv -e .env -- node dist/index.js",
     "docker:up": "docker compose up -d",
     "docker:up:db": "docker compose up -d postgres",
     "docker:down": "docker compose down",
@@ -36,7 +36,10 @@
     "@types/jsonwebtoken": "^9.0.10",
     "@types/morgan": "^1.9.10",
     "@types/node": "^24.5.1",
-    "dotenv-cli": "^10.0.0"
+    "dotenv-cli": "^10.0.0",
+    "tsc-alias": "^1.8.16",
+    "tsc-esm-fix": "^3.1.2",
+    "tsconfig-paths": "^4.2.0"
   },
   "peerDependencies": {
     "typescript": "^5"

@@ -1,5 +1,5 @@
-import type { LoginSchemaType, SignUpSchemaType } from "@/schemas/auth";
-import type { User } from "generated/prisma";
+import type {LoginSchemaType, SignUpSchemaType} from "@/schemas/auth";
+import type {User} from "generated/prisma/index.js";
 
 export type AccessTokenPayload = {
   sub: string;

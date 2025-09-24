@@ -6,7 +6,7 @@ import {AppError} from "@/utils/AppError";
 import {asyncHandler} from "@/utils/asyncHandler";
 import {getDateTime} from "@/utils/date";
 import {getPaginationMeta, getPaginationParams} from "@/utils/pagination";
-import type {Prisma} from "generated/prisma";
+import type {Prisma} from "generated/prisma/index.js";
 
 export const searchVehicle = asyncHandler<
   NoParams,
