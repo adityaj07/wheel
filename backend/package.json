@@ -20,6 +20,7 @@
     "db:migrate:local": "dotenv -e .env.local -- prisma migrate dev",
     "db:migrate:prod": "dotenv -e .env -- prisma migrate deploy",
     "db:studio:local": "dotenv -e .env.local -- prisma studio",
+    "db:studio:prod": "dotenv -e .env -- prisma studio",
     "db:seed:local": "dotenv -e .env.local -- bun run prisma/seed.ts",
     "db:seed:prod": "dotenv -e .env -- bun run prisma/seed.ts",
     "setup:local": "bun install && bun run docker:up && sleep 5 && bun run db:push:local && bun run db:generate",

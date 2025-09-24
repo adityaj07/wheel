@@ -1,7 +1,10 @@
+import {env} from "@/config";
 import {tokenStore} from "@/storage/secureStorage";
 import {StatusCodes} from "@/utils/statusCodes";
 import axios, {AxiosError, AxiosRequestConfig} from "axios";
 import {toast} from "sonner-native";
+
+const API_BASE_URL = env.API_BASE_URL || "http://192.168.31.136:3000/api/v1";
 
 interface ExtendedAxiosRequestConfig extends AxiosRequestConfig {
   _retry?: boolean;
@@ -12,9 +15,6 @@ type failedQueueType = {
   reject: (error?: any) => void;
   config: AxiosRequestConfig;
 };
-
-export const API_BASE_URL =
-  process.env.REACT_NATIVE_API_BASE_URL || "http://192.168.31.136:3000/api/v1";
 
 let isRefreshing = false;
 let failedQueue: failedQueueType[] = [];

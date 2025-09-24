@@ -1,5 +1,6 @@
 import {api} from "@/api";
 import {LoginSchemaType, SignUpSchemaType} from "@/schemas/auth";
+import SplashScreen from "@/screens/auth/SplashScreen";
 import {tokenStore} from "@/storage/secureStorage";
 import {User} from "@/types/user";
 import React, {createContext, useEffect, useState} from "react";
@@ -27,6 +28,10 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({children}) => {
 
   const isAuthenticated = !!user;
 
+  if (isLoading) {
+    return <SplashScreen />;
+  }
+
   const fetchMe = async () => {
     try {
       const res = await api.get("/users/me");
@@ -47,20 +52,19 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({children}) => {
 
       if (!accessToken && !refreshToken) {
         setUser(null);
-        setIsLoading(false);
         return;
       }
 
-      // if tokens exists, we attempt to fetch /me, interceptor will refresh if needed
-      try {
-        await fetchMe();
-      } catch (error) {
-        // ignore
-      } finally {
-        // If after fetchMe we still have no user, ensure user is null
-        if (!user) setUser(null);
+      // Always try to fetch /me – if accessToken is expired,
+      // interceptor will refresh using refreshToken automatically.
+      const success = await fetchMe();
+      if (!success) {
+        // If refresh failed inside interceptor, clear everything
+        tokenStore.clear();
+        setUser(null);
       }
     } catch (error) {
+      tokenStore.clear();
       setUser(null);
     } finally {
       setIsLoading(false);
