@@ -10,6 +10,7 @@ import {
 
 import {useAuth} from "@/contexts/AuthContext";
 import ROUTES from "@/routes/Routes";
+import SplashScreen from "@/screens/auth/SplashScreen";
 import BookingConfirmationScreen from "@/screens/booking/BookingConfirmationScreen";
 import BookingScreen from "@/screens/booking/BookingScreen";
 import RideConfirmationScreen from "@/screens/booking/RideConfirmationScreen";
@@ -19,7 +20,7 @@ import BottomTabNavigator from "./BottomTabNavigator";
 
 const AppContent = () => {
   const Stack = createNativeStackNavigator();
-  const {isAuthenticated} = useAuth();
+  const {isAuthenticated, isLoading} = useAuth();
 
   const handleStateChange = (state: NavigationState | undefined) => {
     Logger.info("Navigation State Changed: ", {

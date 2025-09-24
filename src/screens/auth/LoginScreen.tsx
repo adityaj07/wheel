@@ -2,6 +2,7 @@ import Icon from "@/components/common/Icon";
 import {useAuth} from "@/contexts/AuthContext";
 import {useTheme} from "@/contexts/ThemeContext";
 import {AuthStackParamList} from "@/navigation/navigators/AuthStackNavigator";
+import ROUTES from "@/routes/Routes";
 import {LoginSchema, LoginSchemaType} from "@/schemas/auth/index";
 import {zodResolver} from "@hookform/resolvers/zod";
 import {useNavigation} from "@react-navigation/native";
@@ -176,7 +177,7 @@ const LoginScreen = () => {
 
         {/* Signup Link */}
         <TouchableOpacity
-          onPress={() => navigation.navigate("Signup")}
+          onPress={() => navigation.navigate(ROUTES.SIGNUP)}
           className="mt-6 items-center">
           <Text className="text-[14px]" style={{color: theme.subText}}>
             New here?{" "}

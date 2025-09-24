@@ -7,8 +7,8 @@ import React from "react";
 import {Image, StatusBar, Text, TouchableOpacity, View} from "react-native";
 
 type RootStackParamList = {
-  Phone: undefined;
-  Login: undefined;
+  [ROUTES.PHONE_NUMBER]: undefined;
+  [ROUTES.LOGIN]: undefined;
 };
 
 type ChooseLoginSignupScreenProp = NativeStackNavigationProp<

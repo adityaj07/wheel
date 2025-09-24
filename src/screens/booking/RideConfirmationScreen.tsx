@@ -15,13 +15,13 @@ import {SafeAreaView} from "react-native-safe-area-context";
 import {toast} from "sonner-native";
 
 type RootStackParamList = {
-  Search: {
+  [ROUTES.SEARCH]: {
     pickupDate: string;
     pickupTime: string;
     dropoffDate: string;
     dropoffTime: string;
   };
-  RideConfirmation: {
+  [ROUTES.RIDECONFIRMATION]: {
     selectedVehicle: Vehicle;
     pickupDate: string;
     pickupTime: string;
@@ -29,7 +29,7 @@ type RootStackParamList = {
     dropoffTime: string;
     location: string;
   };
-  BookConfirmation: {
+  [ROUTES.BOOKCONFIRMATION]: {
     booking: BookingListResponse;
   };
 };

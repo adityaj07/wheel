@@ -2,6 +2,7 @@ import Icon from "@/components/common/Icon";
 import {useAuth} from "@/contexts/AuthContext";
 import {useTheme} from "@/contexts/ThemeContext";
 import {AuthStackParamList} from "@/navigation/navigators/AuthStackNavigator";
+import ROUTES from "@/routes/Routes";
 
 import {SignUpSchema, SignUpSchemaType} from "@/schemas/auth";
 import {zodResolver} from "@hookform/resolvers/zod";
@@ -52,8 +53,11 @@ const SignupScreen = () => {
         password,
         confirmPassword,
       });
+      toast.success("Account created!", {
+        description: "Your account has been created. Please login.",
+      });
       // on success, AuthProvider sets user and navigation switches automatically
-      navigation.navigate("Login");
+      navigation.navigate(ROUTES.LOGIN);
     } catch (error: any) {
       const message = error?.response?.data?.message ?? "Signup failed";
       const description = error?.response?.data?.details?.[0]?.message;
@@ -264,7 +268,7 @@ const SignupScreen = () => {
 
         {/* Login Link */}
         <TouchableOpacity
-          onPress={() => navigation.navigate("Login")}
+          onPress={() => navigation.navigate(ROUTES.LOGIN)}
           className="mt-6 items-center">
           <Text className="text-sm" style={{color: theme.subText}}>
             Already have an account?{" "}

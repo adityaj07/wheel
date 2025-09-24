@@ -1,5 +1,6 @@
 import {env} from "@/config";
 import {tokenStore} from "@/storage/secureStorage";
+import Logger from "@/utils/Logger";
 import {StatusCodes} from "@/utils/statusCodes";
 import axios, {AxiosError, AxiosRequestConfig} from "axios";
 import {toast} from "sonner-native";
@@ -36,36 +37,74 @@ const processQueue = (error: any, token: string | null = null) => {
 export const api = axios.create({
   baseURL: API_BASE_URL,
   timeout: 15_000,
+  headers: {
+    "Content-Type": "application/json",
+  },
 });
 
 // attach accestoken here
-api.interceptors.request.use(config => {
-  const accessToken = tokenStore.getAccessToken();
-  if (accessToken && config && config.headers) {
-    config.headers.Authorization = `Bearer ${accessToken}`;
-  }
-  return config;
-});
+api.interceptors.request.use(
+  config => {
+    const accessToken = tokenStore.getAccessToken();
+
+    Logger.authDebug("API Request interceptor", {
+      url: config.url,
+      method: config.method,
+      hasToken: !!accessToken,
+      hasAuthHeader: !!config.headers?.Authorization,
+    });
+
+    if (accessToken && config && config.headers) {
+      config.headers.Authorization = `Bearer ${accessToken}`;
+    }
+
+    return config;
+  },
+  error => {
+    Logger.authError("Request interceptor error", error);
+    return Promise.reject(error);
+  },
+);
 
 // on res status 401, try refresh
 api.interceptors.response.use(
-  res => res,
+  res => {
+    Logger.authDebug("API Response success", {
+      url: res.config.url,
+      status: res.status,
+    });
+    return res;
+  },
   async (err: AxiosError & {config?: ExtendedAxiosRequestConfig}) => {
     const originalRequest = err.config;
+
+    Logger.authError("API Response error", {
+      url: originalRequest?.url,
+      status: err.response?.status,
+      message: err.message,
+    });
+
     if (!originalRequest || originalRequest._retry) {
       return Promise.reject(err);
     }
 
     if (err.response?.status === StatusCodes.UNAUTHORIZED.code) {
-      // Do not try to refresh for refresh-token endpoint or logout to avoid loops
+      // Don't try to refresh for auth endpoints
       if (
         originalRequest.url?.includes("/auth/refresh-token") ||
-        originalRequest.url?.includes("/auth/logout")
+        originalRequest.url?.includes("/auth/logout") ||
+        originalRequest.url?.includes("/auth/login") ||
+        originalRequest.url?.includes("/auth/signup")
       ) {
+        Logger.authDebug("Skipping refresh for auth endpoint", {
+          url: originalRequest.url,
+        });
         return Promise.reject(err);
       }
 
       if (isRefreshing) {
+        Logger.authDebug("Already refreshing, queuing request");
+
         // queue req until refresh finishes
         return new Promise((resolve, reject) => {
           failedQueue.push({
@@ -85,11 +124,14 @@ api.interceptors.response.use(
 
       const refreshToken = tokenStore.getRefreshToken();
       if (!refreshToken) {
+        Logger.authError("No refresh token available");
         isRefreshing = false;
+        processQueue(err, null);
         return Promise.reject(err);
       }
 
       try {
+        Logger.authInfo("Attempting token refresh");
         const resp = await axios.post(
           `${API_BASE_URL}/auth/refresh-token`,
           {
@@ -106,35 +148,38 @@ api.interceptors.response.use(
           expiresAt,
         } = resp.data;
 
-        // save the tokens
+        // save the new tokens
         tokenStore.saveTokens({
           accessToken,
           refreshToken: newRefreshToken,
           expiresAt,
         });
 
-        //set Authorization header for new retries
+        // Update API default headers
         api.defaults.headers.common["Authorization"] = `Bearer ${accessToken}`;
 
+        Logger.authInfo("Token refresh successful");
         processQueue(null, accessToken);
-        isRefreshing = false;
 
-        //retry original request
+        // Retry original request
         originalRequest.headers = originalRequest.headers ?? {};
         originalRequest.headers.Authorization = `Bearer ${accessToken}`;
 
         return api(originalRequest);
       } catch (refreshError) {
-        processQueue(refreshError, null);
-        isRefreshing = false;
-        // If refresh failed, clear the tokens and propagate so the authcontext logout
-        tokenStore.clear();
+        Logger.authError("Token refresh failed", refreshError);
 
-        toast.error("Session Expired.", {
+        processQueue(refreshError, null);
+        tokenStore.clear();
+        api.defaults.headers.common["Authorization"] = undefined;
+
+        toast.error("Session Expired", {
           description: "Please login again.",
         });
 
         return Promise.reject(refreshError);
+      } finally {
+        isRefreshing = false;
       }
     }
 

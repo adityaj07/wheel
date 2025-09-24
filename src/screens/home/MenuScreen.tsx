@@ -17,22 +17,23 @@ import {ConfirmDialog} from "@/components/common/ConfirmDialog";
 import MenuItem from "@/components/home/MenuItem";
 import {useAuth} from "@/contexts/AuthContext";
 import {useTheme} from "@/contexts/ThemeContext";
+import ROUTES from "@/routes/Routes";
 import {NativeStackNavigationProp} from "@react-navigation/native-stack";
 
 type RootStackParamList = {
-  UpdateProfile: undefined;
-  Bookings: undefined;
+  [ROUTES.UPDATEPROFILE]: undefined;
+  [ROUTES.BOOKINGS]: undefined;
 };
 
 const MenuScreen = () => {
   const [confirmLogoutVisible, setConfirmLogoutVisible] = useState(false);
   const {logout, user} = useAuth();
-  const {isDark, theme} = useTheme();
+  const {theme} = useTheme();
   const navigation =
     useNavigation<NativeStackNavigationProp<RootStackParamList>>();
 
-  const handleViewProfile = () => navigation.navigate("UpdateProfile");
-  const handleMyBookings = () => navigation.navigate("Bookings");
+  const handleViewProfile = () => navigation.navigate(ROUTES.UPDATEPROFILE);
+  const handleMyBookings = () => navigation.navigate(ROUTES.BOOKINGS);
 
   return (
     <SafeAreaView style={{backgroundColor: theme.bg}} className="flex-1">

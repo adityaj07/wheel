@@ -1,6 +1,7 @@
 import {IMAGES} from "@/assets/images";
 import Icon from "@/components/common/Icon";
 import {useTheme} from "@/contexts/ThemeContext";
+import ROUTES from "@/routes/Routes";
 import {useNavigation} from "@react-navigation/native";
 import {NativeStackNavigationProp} from "@react-navigation/native-stack";
 import React, {FC, useState} from "react";
@@ -9,18 +10,18 @@ import LinearGradient from "react-native-linear-gradient";
 import {SafeAreaView} from "react-native-safe-area-context";
 
 type RootStackParamList = {
-  PhoneNumber: undefined;
-  Otp: {
+  [ROUTES.PHONE_NUMBER]: undefined;
+  [ROUTES.OTP]: {
     sessionId: string;
     phone: string;
     isLogin?: boolean;
   };
-  Home: undefined;
+  [ROUTES.HOME]: undefined;
 };
 
 type PhoneNumberScreenNavigationProps = NativeStackNavigationProp<
   RootStackParamList,
-  "PhoneNumber"
+  "Phone"
 >;
 
 const PhoneNumberScreen: FC = () => {

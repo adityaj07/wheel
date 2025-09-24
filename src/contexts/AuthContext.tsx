@@ -1,10 +1,8 @@
 import {api} from "@/api";
 import {LoginSchemaType, SignUpSchemaType} from "@/schemas/auth";
-import SplashScreen from "@/screens/auth/SplashScreen";
 import {tokenStore} from "@/storage/secureStorage";
 import {User} from "@/types/user";
 import React, {createContext, useEffect, useState} from "react";
-import {toast} from "sonner-native";
 
 interface AuthProviderProps {
   children: React.ReactNode;
@@ -28,10 +26,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({children}) => {
 
   const isAuthenticated = !!user;
 
-  if (isLoading) {
-    return <SplashScreen />;
-  }
-
   const fetchMe = async () => {
     try {
       const res = await api.get("/users/me");
@@ -40,31 +34,58 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({children}) => {
       return true;
     } catch (error) {
       // if 401 -> handled by api interceptor, will try refresh automatically
+      console.error("Failed to fetch user profile:", error);
       return false;
     }
   };
 
   const tryRestoreSession = async () => {
-    setIsLoading(true);
     try {
       const accessToken = tokenStore.getAccessToken();
       const refreshToken = tokenStore.getRefreshToken();
 
+      // If no tokens exist, user is not authenticated
       if (!accessToken && !refreshToken) {
         setUser(null);
+        setIsLoading(false);
         return;
       }
 
-      // Always try to fetch /me – if accessToken is expired,
-      // interceptor will refresh using refreshToken automatically.
-      const success = await fetchMe();
-      if (!success) {
-        // If refresh failed inside interceptor, clear everything
+      // If we have an access token, set it in the API headers
+      if (accessToken) {
+        api.defaults.headers.common["Authorization"] = `Bearer ${accessToken}`;
+
+        // Try to fetch user profile
+        const success = await fetchMe();
+
+        if (success) {
+          setIsLoading(false);
+          return;
+        }
+      }
+
+      // If access token failed or doesn't exist, but we have refresh token
+      if (refreshToken && !accessToken) {
+        // The API interceptor will handle the refresh automatically
+        // when we make the fetchMe request
+        const success = await fetchMe();
+
+        if (!success) {
+          // If refresh also failed, clear everything
+          tokenStore.clear();
+          api.defaults.headers.common["Authorization"] = undefined;
+          setUser(null);
+        }
+      } else {
+        // No refresh token available, clear everything
         tokenStore.clear();
+        api.defaults.headers.common["Authorization"] = undefined;
         setUser(null);
       }
     } catch (error) {
+      console.error("Session restore failed:", error);
       tokenStore.clear();
+      api.defaults.headers.common["Authorization"] = undefined;
       setUser(null);
     } finally {
       setIsLoading(false);
@@ -72,8 +93,18 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({children}) => {
   };
 
   useEffect(() => {
-    // on mount, try restoring session
-    tryRestoreSession();
+    // Initialize API with stored token on app start
+    const initializeAPI = async () => {
+      const accessToken = tokenStore.getAccessToken();
+      if (accessToken) {
+        api.defaults.headers.common["Authorization"] = `Bearer ${accessToken}`;
+      }
+
+      // Then try to restore session
+      await tryRestoreSession();
+    };
+
+    initializeAPI();
   }, []);
 
   const signup = async ({name, email, password}: SignUpSchemaType) => {
@@ -84,13 +115,11 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({children}) => {
         email,
         password,
       });
-      toast.success("Account created!", {
-        description: "Your account has been created. Please login.",
-      });
-      setIsLoading(false);
     } catch (error) {
       setIsLoading(false);
       throw error;
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -100,17 +129,20 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({children}) => {
       const res = await api.post("/auth/login", {email, password});
       const {accessToken, refreshToken, expiresAt} = res.data;
 
+      // Save tokens
       tokenStore.saveTokens({accessToken, refreshToken, expiresAt});
-      // we ensure that the api uses new token
+
+      // Set authorization header
       api.defaults.headers.common["Authorization"] = `Bearer ${accessToken}`;
 
-      //fetch profile
+      // Fetch user profile
       const me = await api.get("/users/me");
       setUser(me.data.user);
-      setIsLoading(false);
     } catch (error) {
       setIsLoading(false);
       throw error;
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -120,12 +152,14 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({children}) => {
       const refreshToken = tokenStore.getRefreshToken();
       if (refreshToken) {
         try {
-          await api.post("/auth/logout", {refreshToken: refreshToken});
+          await api.post("/auth/logout", {refreshToken});
         } catch (e) {
-          // ignore server logout errors, we'll clear local state anyway
+          // Ignore server logout errors, we'll clear local state anyway
+          console.warn("Server logout failed, clearing local state anyway:", e);
         }
       }
     } finally {
+      // Always clear local state
       tokenStore.clear();
       api.defaults.headers.common["Authorization"] = undefined;
       setUser(null);

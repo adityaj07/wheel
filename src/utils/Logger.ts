@@ -1,64 +1,58 @@
-type LogLevel = "info" | "warn" | "error" | "debug";
+// logger.ts
+type LogLevel = "info" | "error" | "warn" | "debug";
 
-const COLORS = {
-  reset: "\x1b[0m",
-  info: "\x1b[36m",   // cyan
-  warn: "\x1b[33m",   // yellow
-  error: "\x1b[31m",  // red
-  debug: "\x1b[35m",  // magenta
-};
+interface Logger {
+  info: (message: string, data?: any) => void;
+  error: (message: string, error?: any) => void;
+  warn: (message: string, data?: any) => void;
+  debug: (message: string, data?: any) => void;
 
-// Safe stringify that avoids crashes on circular objects
-function safeStringify(obj: any, space = 2): string {
-  try {
-    const cache = new Set();
-    return JSON.stringify(
-      obj,
-      (key, value) => {
-        if (typeof value === "object" && value !== null) {
-          if (cache.has(value)) return "[Circular]";
-          cache.add(value);
-        }
-        return value;
-      },
-      space
-    );
-  } catch {
-    return String(obj);
-  }
+  // Auth-specific
+  authInfo: (message: string, data?: any) => void;
+  authError: (message: string, error?: any) => void;
+  authDebug: (message: string, data?: any) => void;
 }
 
-const Logger = {
-  log: (level: LogLevel, message: string, data?: unknown) => {
-    const timestamp = new Date().toISOString();
-    const color = COLORS[level];
-    const formatted =
-      data !== undefined
-        ? `${message} ${safeStringify(data)}`
-        : message;
-
-    const logLine = `${color}[${level.toUpperCase()}] [${timestamp}]${COLORS.reset} ${formatted}`;
+const createLogger = (
+  isDevelopment: boolean = __DEV__ || process.env.NODE_ENV === "development",
+): Logger => {
+  const log = (level: LogLevel, message: string, data?: any) => {
+    if (!isDevelopment) {
+      // In production → forward to crash reporting service (Sentry, etc.)
+      if (level === "error") {
+        // Example: Sentry.captureException(data ?? message);
+      }
+      return;
+    }
 
     switch (level) {
       case "info":
-        console.info(logLine);
-        break;
-      case "warn":
-        console.warn(logLine);
+        console.log(`[INFO] ${message}`, data ?? "");
         break;
       case "error":
-        console.error(logLine);
+        console.error(`[ERROR] ${message}`, data ?? "");
+        break;
+      case "warn":
+        console.warn(`[WARN] ${message}`, data ?? "");
         break;
       case "debug":
-        if (__DEV__) console.debug(logLine); // only log debug in dev mode
+        console.debug(`[DEBUG] ${message}`, data ?? "");
         break;
     }
-  },
+  };
 
-  info: (message: string, data?: unknown) => Logger.log("info", message, data),
-  warn: (message: string, data?: unknown) => Logger.log("warn", message, data),
-  error: (message: string, data?: unknown) => Logger.log("error", message, data),
-  debug: (message: string, data?: unknown) => Logger.log("debug", message, data),
+  return {
+    info: (message, data) => log("info", message, data),
+    error: (message, error) => log("error", message, error),
+    warn: (message, data) => log("warn", message, data),
+    debug: (message, data) => log("debug", message, data),
+
+    authInfo: (message, data) => log("info", `[AUTH] ${message}`, data),
+    authError: (message, error) => log("error", `[AUTH] ${message}`, error),
+    authDebug: (message, data) => log("debug", `[AUTH] ${message}`, data),
+  };
 };
+
+const Logger = createLogger();
 
 export default Logger;
