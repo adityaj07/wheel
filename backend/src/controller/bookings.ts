@@ -63,54 +63,56 @@ export const create = asyncHandler<NoParams, NoParams, CreateBookingBody>(
 
     // we check is the vehicle is already booked in the requested slot and if available we create booking
     // We wrap it inside txn
-    const newBooking = await db.$transaction(async tx => {
-      const alreadyBooked = await tx.booking.findFirst({
-        where: {
-          vehicleId,
-          startDate: {
-            lt: endDateTime,
-          },
-          endDate: {
-            gt: startDateTime,
-          },
-          status: {
-            in: ["CONFIRMED", "ACTIVE"],
-          },
-        },
-      });
-
-      if (alreadyBooked) {
-        throw new AppError(
-          "Vehicle not available in selected time range",
-          StatusCodes.CONFLICT.code,
-        );
-      }
-
-      // create the booking
-      return await tx.booking.create({
-        data: {
-          userId,
-          vehicleId,
-          location,
-          startDate: startDateTime,
-          endDate: endDateTime,
-          startTime,
-          endTime,
-          totalPrice: calculatedPrice,
-          status: "CONFIRMED",
-        },
-        include: {
-          vehicle: {
-            select: {
-              id: true,
-              name: true,
-              imageUrl: true,
-              vehicleType: {select: {name: true}},
+    const newBooking = await db.$transaction(
+      async (tx: Parameters<Parameters<typeof db.$transaction>[0]>[0]) => {
+        const alreadyBooked = await tx.booking.findFirst({
+          where: {
+            vehicleId,
+            startDate: {
+              lt: endDateTime,
+            },
+            endDate: {
+              gt: startDateTime,
+            },
+            status: {
+              in: ["CONFIRMED", "ACTIVE"],
             },
           },
-        },
-      });
-    });
+        });
+
+        if (alreadyBooked) {
+          throw new AppError(
+            "Vehicle not available in selected time range",
+            StatusCodes.CONFLICT.code,
+          );
+        }
+
+        // create the booking
+        return await tx.booking.create({
+          data: {
+            userId,
+            vehicleId,
+            location,
+            startDate: startDateTime,
+            endDate: endDateTime,
+            startTime,
+            endTime,
+            totalPrice: calculatedPrice,
+            status: "CONFIRMED",
+          },
+          include: {
+            vehicle: {
+              select: {
+                id: true,
+                name: true,
+                imageUrl: true,
+                vehicleType: {select: {name: true}},
+              },
+            },
+          },
+        });
+      },
+    );
 
     const result = {
       id: newBooking.id,
