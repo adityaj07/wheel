@@ -51,26 +51,26 @@ const ChooseLoginSignupScreen = () => {
 
       {/* Buttons */}
       <View className="flex flex-col gap-4">
-        {/* Phone Button */}
-        <TouchableOpacity
-          onPress={() => navigation.navigate(ROUTES.PHONE_NUMBER)}
-          className="w-full py-4 rounded-xl flex-row justify-center items-center"
-          style={{backgroundColor: theme.primary}}>
-          <Text className="text-white font-medium text-lg">
-            Continue with Phone Number
-          </Text>
-        </TouchableOpacity>
-
         {/* Email Button */}
         <TouchableOpacity
           onPress={() => navigation.navigate(ROUTES.LOGIN)}
+          className="w-full py-4 rounded-xl flex-row justify-center items-center"
+          style={{backgroundColor: theme.primary}}>
+          <Text className="text-white font-medium text-lg">
+            Continue with Email
+          </Text>
+        </TouchableOpacity>
+
+        {/* Phone Number Button */}
+        <TouchableOpacity
+          onPress={() => navigation.navigate(ROUTES.PHONE_NUMBER)}
           className="w-full py-4 rounded-xl flex-row justify-center items-center border"
           style={{
             borderColor: theme.border,
             backgroundColor: theme.card,
           }}>
           <Text className="font-medium text-lg" style={{color: theme.text}}>
-            Continue with Email
+            Continue with Phone Number
           </Text>
         </TouchableOpacity>
       </View>
