@@ -68,10 +68,14 @@ const RideConfirmationScreen: FC = () => {
         location,
       });
 
+      console.log("Handle Proceed to pay api response", response);
+
       toast.success("Booking Successful");
+      console.log("Toast should appear now");
       navigation.navigate(ROUTES.BOOKCONFIRMATION, {
         booking: response.data.data,
       });
+      console.log("Navigating to confirmation screen");
     } catch (error: any) {
       const errorMessage =
         error?.response?.data?.message || "Some error occurred while booking";
@@ -90,24 +94,20 @@ const RideConfirmationScreen: FC = () => {
 
   return (
     <SafeAreaView className="flex-1" style={{backgroundColor: theme.bg}}>
-      <ScrollView className="flex-1">
+      <ScrollView
+        className="flex-1"
+        contentContainerStyle={{paddingBottom: 100}}
+        showsVerticalScrollIndicator={false}>
         {/* Header */}
         <View
           className="rounded-b-3xl px-5 pt-4 pb-6 mb-6"
           style={{backgroundColor: theme.primary}}>
           <View className="flex flex-row items-center justify-between mb-6">
             <TouchableOpacity onPress={() => navigation.goBack()}>
-              <Icon
-                type="ion"
-                name="arrow-back"
-                size={24}
-                color={theme.onPrimary}
-              />
+              <Icon type="ion" name="arrow-back" size={24} color={theme.text} />
             </TouchableOpacity>
 
-            <Text
-              className="text-lg font-semibold"
-              style={{color: theme.onPrimary}}>
+            <Text className="text-lg font-semibold" style={{color: theme.text}}>
               SUMMARY
             </Text>
 
@@ -277,23 +277,59 @@ const RideConfirmationScreen: FC = () => {
             valueStyle={{fontWeight: "600", color: theme.text}}
           />
         </SectionCard>
+      </ScrollView>
 
-        {/* Proceed to Pay Button */}
+      {/* Floating Proceed Button */}
+      <View
+        style={{
+          position: "absolute",
+          bottom: 20,
+          left: 16,
+          right: 16,
+          zIndex: 10,
+        }}>
         <TouchableOpacity
           disabled={loading}
           onPress={handleProceedToPay}
-          className="rounded-xl mx-4 my-4 p-4"
           style={{
+            flexDirection: "row",
+            alignItems: "center",
+            justifyContent: "space-between",
+            paddingVertical: 16,
+            paddingHorizontal: 24,
+            borderRadius: 30,
             backgroundColor: theme.primary,
-            opacity: loading ? 0.7 : 1,
+            shadowColor: "#000",
+            shadowOffset: {width: 0, height: 6},
+            shadowOpacity: 0.2,
+            shadowRadius: 10,
+            elevation: 8,
           }}>
+          {/* Amount */}
           <Text
-            className="text-center font-semibold"
-            style={{color: theme.text}}>
-            {loading ? "Processing..." : "PROCEED TO PAY"}
+            style={{
+              fontSize: 16,
+              fontWeight: "700",
+              color: theme.text,
+            }}>
+            ₹{totalPrice.toFixed(2)}
           </Text>
+          {/* Button Text */}
+          <Text
+            style={{
+              fontSize: 16,
+              fontWeight: "600",
+              color: theme.text,
+              textAlign: "center",
+              flex: 1,
+              marginHorizontal: 12,
+            }}>
+            {loading ? "Processing..." : "Proceed to Pay"}
+          </Text>
+          {/* Arrow */}
+          <Icon type="ion" name="arrow-forward" size={20} color={theme.text} />
         </TouchableOpacity>
-      </ScrollView>
+      </View>
     </SafeAreaView>
   );
 };

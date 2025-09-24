@@ -2,6 +2,7 @@ import {api} from "@/api";
 import {GetUserBookingsResponse} from "@/types/user";
 import {createContext, ReactNode, useContext, useEffect, useState} from "react";
 import {toast} from "sonner-native";
+import {useAuth} from "./AuthContext";
 
 type Booking = GetUserBookingsResponse["data"][0];
 
@@ -40,6 +41,8 @@ export const BookingsProvider = ({children}: {children: ReactNode}) => {
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
 
+  const {isAuthenticated, isLoading} = useAuth();
+
   const setFilters = (updates: Partial<Filters>) => {
     setFiltersState(prev => ({...prev, ...updates}));
   };
@@ -73,8 +76,10 @@ export const BookingsProvider = ({children}: {children: ReactNode}) => {
 
   // initial fetch
   useEffect(() => {
-    fetchBookings(1);
-  }, []);
+    if (!isLoading && isAuthenticated) {
+      fetchBookings(1);
+    }
+  }, [isAuthenticated, isLoading]);
 
   // filtering logic
   const filteredBookings = allBookings.filter(b => {

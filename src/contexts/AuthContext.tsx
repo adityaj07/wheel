@@ -44,10 +44,18 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({children}) => {
       const accessToken = tokenStore.getAccessToken();
       const refreshToken = tokenStore.getRefreshToken();
 
+      console.log("accessTOken inside context => ", accessToken);
+      console.log("refreshTOken inside context => ", refreshToken);
+
       // If no tokens exist, user is not authenticated
       if (!accessToken && !refreshToken) {
         setUser(null);
         setIsLoading(false);
+        console.log(
+          "Called when none of the tokens exist and Loading state => ",
+          isLoading,
+        );
+
         return;
       }
 
@@ -75,12 +83,14 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({children}) => {
           tokenStore.clear();
           api.defaults.headers.common["Authorization"] = undefined;
           setUser(null);
+          setIsLoading(false);
         }
       } else {
         // No refresh token available, clear everything
         tokenStore.clear();
         api.defaults.headers.common["Authorization"] = undefined;
         setUser(null);
+        setIsLoading(false);
       }
     } catch (error) {
       console.error("Session restore failed:", error);

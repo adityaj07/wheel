@@ -27,10 +27,11 @@ type SignupScreenNavigationProp = NativeStackNavigationProp<
 const SignupScreen = () => {
   const navigation = useNavigation<SignupScreenNavigationProp>();
   const {theme} = useTheme();
-  const {signup, isLoading} = useAuth();
+  const {signup} = useAuth();
 
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
   const {
     control,
@@ -46,6 +47,7 @@ const SignupScreen = () => {
     password,
     confirmPassword,
   }: SignUpSchemaType) => {
+    setIsLoading(true);
     try {
       await signup({
         name,
@@ -68,6 +70,8 @@ const SignupScreen = () => {
           backgroundColor: "red",
         },
       });
+    } finally {
+      setIsLoading(false);
     }
   };
 

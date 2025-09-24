@@ -10,7 +10,14 @@ import SplashScreen from "./screens/auth/SplashScreen";
 
 function AppContent() {
   const {statusBarStyle, theme} = useTheme();
-  const {isLoading} = useAuth();
+  const {isLoading, isAuthenticated} = useAuth();
+
+  console.log(
+    "AppContent: isLoading=",
+    isLoading,
+    "isAuthenticated=",
+    isAuthenticated,
+  );
 
   if (isLoading) {
     return <SplashScreen />;

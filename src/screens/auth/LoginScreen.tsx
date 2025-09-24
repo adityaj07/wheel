@@ -26,9 +26,10 @@ type LoginScreenNavigationProp = NativeStackNavigationProp<
 const LoginScreen = () => {
   const navigation = useNavigation<LoginScreenNavigationProp>();
   const {theme} = useTheme();
-  const {login, isLoading} = useAuth();
+  const {login} = useAuth();
 
   const [showPassword, setShowPassword] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
   const {
     control,
@@ -39,6 +40,7 @@ const LoginScreen = () => {
   });
 
   const onSubmit = async ({email, password}: LoginSchemaType) => {
+    setIsLoading(true);
     try {
       await login({email, password});
       // on success, AuthProvider sets user and navigation switches automatically
@@ -52,6 +54,8 @@ const LoginScreen = () => {
           backgroundColor: "red",
         },
       });
+    } finally {
+      setIsLoading(false);
     }
   };
 
