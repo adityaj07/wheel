@@ -4,6 +4,7 @@ import {FC, useState} from "react";
 import {
   ActivityIndicator,
   Image,
+  RefreshControl,
   ScrollView,
   Text,
   TouchableOpacity,
@@ -30,12 +31,20 @@ type BookingScreenNavigationProp =
 const BookingScreen: FC = () => {
   const navigation = useNavigation<BookingScreenNavigationProp>();
   const {theme} = useTheme();
-  const {filteredBookings, loading, filters, setFilters} = useBookings();
+  const {filteredBookings, loading, filters, setFilters, refreshBookings} =
+    useBookings();
 
   const [modals, setModals] = useState({
     showStartDate: false,
     showEndDate: false,
   });
+  const [refreshing, setRefreshing] = useState(false);
+
+  const onRefresh = async () => {
+    setRefreshing(true);
+    await refreshBookings();
+    setRefreshing(false);
+  };
 
   const toggleModal = (key: keyof typeof modals, value: boolean) => {
     setModals(prev => ({...prev, [key]: value}));
@@ -143,7 +152,16 @@ const BookingScreen: FC = () => {
       </View>
 
       {/* Bookings Content */}
-      <ScrollView className="p-4">
+      <ScrollView
+        className="p-4"
+        refreshControl={
+          <RefreshControl
+            refreshing={refreshing}
+            onRefresh={onRefresh}
+            colors={[theme.primary]}
+            tintColor={theme.primary}
+          />
+        }>
         {loading ? (
           <View className="flex-1 justify-center items-center py-12">
             <ActivityIndicator size="large" color={theme.primary} />

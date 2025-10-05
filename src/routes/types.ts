@@ -25,6 +25,7 @@ export type RootStackParamList = {
   };
   [ROUTES.SPLASH]: undefined;
   [ROUTES.UPDATEPROFILE]: undefined;
+  [ROUTES.BOOKINGS]: undefined;
 };
 
 export type RootStackScreenProps<T extends keyof RootStackParamList> =

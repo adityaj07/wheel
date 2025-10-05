@@ -21,6 +21,7 @@ interface BookingsContextType {
   setFilters: (updates: Partial<Filters>) => void;
   fetchNextPage: () => Promise<void>;
   hasMore: boolean;
+  refreshBookings: () => Promise<void>;
 }
 
 const BookingsContext = createContext<BookingsContextType | undefined>(
@@ -74,12 +75,16 @@ export const BookingsProvider = ({children}: {children: ReactNode}) => {
     setPage(nextPage);
   };
 
-  // initial fetch
   useEffect(() => {
     if (!isLoading && isAuthenticated) {
       fetchBookings(1);
     }
   }, [isAuthenticated, isLoading]);
+
+  const refreshBookings = async () => {
+    setPage(1);
+    await fetchBookings(1);
+  };
 
   // filtering logic
   const filteredBookings = allBookings.filter(b => {
@@ -100,6 +105,7 @@ export const BookingsProvider = ({children}: {children: ReactNode}) => {
         setFilters,
         fetchNextPage,
         hasMore,
+        refreshBookings,
       }}>
       {children}
     </BookingsContext.Provider>

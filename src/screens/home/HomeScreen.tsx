@@ -72,7 +72,7 @@ const HomeScreen = () => {
     <SafeAreaView className="flex-1 pb-20" style={{backgroundColor: theme.bg}}>
       {/* Header */}
       <Header
-        location="Mira-Bhayandar"
+        location="Mumbai"
         onLocationPress={handleLocationPress}
         onOffersPress={handleOffersPress}
       />
@@ -84,7 +84,7 @@ const HomeScreen = () => {
         contentContainerStyle={{paddingBottom: 32}}>
         {/* Booking Form */}
         <View
-          className="px-4 mt-4 rounded-2xl"
+          className="px-4 mt-4 rounded-2xl pb-4"
           style={[{backgroundColor: theme.card}, theme.shadow]}>
           <BookingForm
             bookingData={bookingData}

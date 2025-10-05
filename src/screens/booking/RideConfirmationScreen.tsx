@@ -59,6 +59,14 @@ const RideConfirmationScreen: FC = () => {
   const handleProceedToPay = async () => {
     try {
       setLoading(true);
+      console.log("Booking payload:", {
+        vehicleId: selectedVehicle.id,
+        startDate: pickupDate,
+        startTime: pickupTime,
+        endDate: dropoffDate,
+        endTime: dropoffTime,
+        location,
+      });
       const response = await api.post("/bookings/create", {
         vehicleId: selectedVehicle.id,
         startDate: pickupDate,

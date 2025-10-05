@@ -3,6 +3,7 @@ import {StatusBar} from "react-native";
 
 import {useEffect, useState} from "react";
 import {GestureHandlerRootView} from "react-native-gesture-handler";
+import {Toaster} from "sonner-native";
 import {useAuth} from "./contexts/AuthContext";
 import "./global.css";
 import RootNavigator from "./navigation/navigators/RootNavigator";
@@ -42,6 +43,7 @@ export default function App() {
     <GestureHandlerRootView style={{flex: 1}}>
       <Providers>
         <AppContent />
+        <Toaster />
       </Providers>
     </GestureHandlerRootView>
   );
